@@ -7,6 +7,6 @@
 # * https://testthat.r-lib.org/articles/special-files.html
 
 library(testthat)
-library(aoc.tests.demo)
+library(aocR)
 
-test_check("aoc.tests.demo")
+test_check("aocR")
