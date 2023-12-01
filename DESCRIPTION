@@ -1,8 +1,12 @@
-Package: aoc.rstats.template
-Title: Advent of Code R template
+Package: aocR
+Title: Advent of Code R
 Version: 0.0.0.9000
 Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"))
+    person(given = "Roberto",
+           family = "Villegas-Diaz",
+           role = c("aut", "cre"),
+           email = "r.villegas-diaz@outlook.com",
+           comment = c(ORCID = "0000-0001-5036-8661"))
 Description: A template R package that can be used to help you take part in 
     Advent of Code, with an example function and corresponding test file that
     uses 'testthat' package.
