@@ -5,7 +5,7 @@ test_that("day 01 - part a function achieves expected result", {
 })
 
 test_that("day 01 - part b function achieves expected result", {
-  # x <- load_test_data("01b")
-  #
-  # expect_equal(f01a(x), 281)
+  x <- load_test_data("01b")
+
+  expect_equal(f01b(x), 281)
 })
