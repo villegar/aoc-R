@@ -2,5 +2,8 @@
 
 export(aoc_solutions)
 export(example_data_01)
+export(f01_helper)
 export(f01a)
 export(f01b)
+export(lookup_digit)
+export(reverse_string)

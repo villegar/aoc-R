@@ -86,5 +86,5 @@ the calibration values?}
 }
 \examples{
 f01a(example_data_01())
-f01b()
+f01b(example_data_01(2))
 }
