@@ -77,7 +77,7 @@
 #' @export
 #' @examples
 #' f02a(example_data_02())
-#' f02b()
+#' f02b(example_data_02())
 f02a <- function(x, n_red = 12, n_green = 13, n_blue = 14) {
   limits_df <- data.frame(
     colour = c("red", "green", "blue"),
@@ -98,12 +98,16 @@ f02a <- function(x, n_red = 12, n_green = 13, n_blue = 14) {
 #' @rdname day02
 #' @export
 f02b <- function(x) {
-
-}
-
-
-f02_helper <- function(x) {
-
+  # parse each game into data frames
+  parsed_games <- lapply(x, parse_game)
+  # find minimum sets
+  minimum_sets <- lapply(parsed_games, find_minimum_set)
+  # find the product of the values
+  power_of_sets <- sapply(minimum_sets, function(x) {
+    prod(as.numeric(x$count), na.rm = TRUE)
+  })
+  # find sum of game IDs
+  sum(power_of_sets, na.rm = TRUE)
 }
 
 #' Parse string with game details, see
@@ -187,6 +191,24 @@ validate_hands <- function(x, limits_df) {
     aux_2 <- merge(aux, limits_df, by = "colour", sort = FALSE)
     all(aux_2$count <= aux_2$max_count)
   })
+}
+
+#' Find the minimum set of cubes for a game, see
+#' [day 2 - 2023](https://adventofcode.com/2023/day/2/#part2)
+#'
+#' @param x Data frame with game details.
+#'
+#' @return Data frame with minim set of cubes required.
+#' @export
+#'
+#' @examples
+#' demo <- parse_game("Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green")
+#' find_minimum_set(demo)
+find_minimum_set <- function(x) {
+  # find the maximum cube counts across all hands for each colour
+  aux <- by(x, as.character(x$colour), function(x) x[which.max(x$count), ])
+  # combine the previous result into a data frame
+  do.call(rbind, aux)
 }
 
 #' @param example Which example data to use (by position or name). Defaults to

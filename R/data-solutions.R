@@ -1,10 +1,10 @@
 #' Advent of Code 2023 solutions
 #' @export
 aoc_solutions <- list(
-  day01a = 55017,
-  day01b = 53539,
-  day02a = NA,
-  day02b = NA,
+  day01a = 55017L,
+  day01b = 53539L,
+  day02a = 2486L,
+  day02b = 87984L,
   day03a = NA,
   day03b = NA,
   day04a = NA,
