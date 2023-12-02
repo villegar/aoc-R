@@ -68,7 +68,7 @@
 #' @export
 #' @examples
 #' f01a(example_data_01())
-#' f01b()
+#' f01b(example_data_01(2))
 f01a <- function(x) {
   # extract first and last digits
   first_digit <- sub("^\\D*(\\d).*$", "\\1", x)
@@ -81,10 +81,24 @@ f01a <- function(x) {
 #' @rdname day01
 #' @export
 f01b <- function(x) {
-
+  # extract first and last digits
+  first_digit <- sapply(x, lookup_digit)
+  last_digit <- sapply(x, lookup_digit, backwards = TRUE)
+  # call helper function to calculate sum
+  f01_helper(first_digit, last_digit)
 }
 
 
+#' Combines two vectors with digits and returns the sum
+#'
+#' @param first_digit Vector with first digits.
+#' @param last_digit Vector with last digits.
+#'
+#' @return Sum of the combination of both vectors
+#' @export
+#'
+#' @examples
+#' f01_helper("1", "2") # should return 12
 f01_helper <- function(first_digit, last_digit) {
   # combine first and last digits
   cali_vals <- paste0(first_digit, last_digit)
@@ -98,6 +112,79 @@ f01_helper <- function(first_digit, last_digit) {
   sum(cali_vals_num, na.rm = TRUE)
 }
 
+#' Reverse a string
+#'
+#' @param x Original string.
+#'
+#' @return Reversed string
+#' @export
+#'
+#' @examples
+#' reverse_string("ouch")
+reverse_string <- function(x) {
+  intToUtf8(rev(utf8ToInt(x)))
+}
+
+#' Lookup digits in a string
+#'
+#' Lookup digits in a string, either text (e.g., 'one', 'two', ...) or numerical
+#' characters. Once it finds the first digit it returns it.
+#'
+#' @param x Input string with digits.
+#' @param backwards Flag to indicate the direction of search, if `TRUE`, then
+#'     look up digits backwards, otherwise, just find the first digit in the
+#'     string.
+#'
+#' @return String with numeric digit
+#' @export
+#'
+#' @examples
+#' lookup_digit("m9qvkqlgfhtwo3seven4seven")
+#' lookup_digit("m9qvkqlgfhtwo3seven4seven", TRUE)
+lookup_digit <- function(x, backwards = FALSE) {
+  lookup_df <- data.frame(
+    label = c("one", "two", "three", "four", "five",
+              "six", "seven", "eight", "nine"),
+    value = c(1, 2, 3, 4, 5, 6, 7, 8, 9)
+  )
+
+  # check the direction of the search
+  if (backwards) {
+    x <- sapply(x, reverse_string)
+    lookup_df$label <- sapply(lookup_df$label, reverse_string)
+  }
+
+  last_chr <- 1
+  last_chr_suffix <- FALSE
+  new_str <- ""
+  i <- 1
+  while (i <= nchar(x)) {
+    txt <- substr(x, last_chr, i)
+    has_digits <- grepl("[0-9]+", txt)
+    is_suffix <- any(startsWith(lookup_df$label, txt))
+    is_num <- txt %in% lookup_df$label
+    if (has_digits) {
+      new_str <- gsub("\\D", "", txt)
+      break
+    } else if (is_num) {
+      new_str <- lookup_df$value[lookup_df$label == txt]
+      break
+    } else if (!is_suffix) {
+      if (last_chr_suffix) {
+        last_chr_suffix <- FALSE
+        i <- i - 1 # don't move to the next character
+        last_chr <- i
+      } else {
+        last_chr <- last_chr + 1 # move to the next character
+      }
+    } else {
+      last_chr_suffix <- TRUE # flag that current character is a valid suffix
+    }
+    i <- i + 1 # move to the next character
+  }
+
+  return(new_str)
+}
 
 #' @param example Which example data to use (by position or name). Defaults to
 #'   1.

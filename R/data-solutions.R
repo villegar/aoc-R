@@ -2,7 +2,7 @@
 #' @export
 aoc_solutions <- list(
   day01a = 55017,
-  day01b = NA,
+  day01b = 53539,
   day02a = NA,
   day02b = NA,
   day03a = NA,
