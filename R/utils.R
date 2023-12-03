@@ -16,3 +16,111 @@ load_real_data <- function(day = "00") {
   readLines(input_path, warn = FALSE)
 
 }
+
+#' Get adjacent indices
+#'
+#' @param x Origin index.
+#' @param max_x Max value.
+#' @param k Numeric value with the range of the indices.
+#'
+#' @return Vector with indices
+#' @export
+#'
+#' @examples
+#' get_indices(1, 10)
+#' get_indices(1, 10, 5)
+get_indices <- function(x, max_x, k = 1) {
+  idx <- (x - k):(x + k)
+  idx[idx > 0 & idx <= max_x]
+}
+
+#' Get adjacent elements from a 2D object
+#'
+#' @param x 2D object.
+#' @param i Reference row.
+#' @param j Reference column.
+#'
+#' @return Matrix with adjacent elements
+#' @export
+get_adjacent_elements <- function(x, i, j) {
+  x[get_indices(i, nrow(x)), get_indices(j, ncol(x))]
+}
+
+#' Get adjacent numeric elements from a 2D object in the same row
+#'
+#' @param x 2D object.
+#' @param i Reference row.
+#' @param j Reference column.
+#'
+#' @return Matrix with adjacent elements
+#' @export
+get_adjacent_elements_row <- function(x, i, j) {
+  row_values <- x[i, ]
+  idx <- !grepl("\\D", row_values) & !is.na(row_values)
+  last <- last_true_element(idx, j)
+  first <- first_true_element(idx, j)
+  if (any(is.na(first), is.na(last)))
+    return(NA)
+  tryCatch(row_values[sort(min(first, last):max(first, last))],
+           error = function(e) {
+             message(x)
+             message(i, ", ", j)
+           })
+}
+
+#' Get the first `TRUE` consecutive element from reference point
+#'
+#' @param x Vector with logical values.
+#' @param i Reference point
+#'
+#' @return Numeric value with the index for the first `TRUE` consecutive element
+#' @export
+first_true_element <- function(x, i) {
+  if (i > 0) {
+    if (x[i])
+      return(first_true_element(x, i - 1))
+    return(i + 1)
+  }
+  return(i + 1)
+}
+
+#' Get the last `TRUE` consecutive element from reference point
+#'
+#' @param x Vector with logical values.
+#' @param i Reference point
+#'
+#' @return Numeric value with the index for the last `TRUE` consecutive element
+#' @export
+last_true_element <- function(x, i) {
+  if (i <= length(x)) {
+    if (x[i])
+      return(last_true_element(x, i + 1))
+    return(i - 1)
+  }
+  return(i - 1)
+}
+
+#' Convert 2D subscript to linear
+#'
+#' @param x 2D object.
+#' @param i Reference row.
+#' @param j Reference column.
+#'
+#' @return Numeric value with linear index.
+#' @export
+get_linear_subscripts <- function(x, i, j) {
+  (i - 1) * nrow(x) + j
+}
+
+#' Convert linear subscript to 2D
+#'
+#' @param x 2D object.
+#' @param ind Numeric value with linear index
+#'
+#' @return 2D array with row and column indices.
+#' @export
+get_matrix_subscripts <- function(x, ind) {
+  data.frame(i = row(x)[ind], j = col(x)[ind])
+  # arrayInd(ind, .dim = dim(x))
+  # t(sapply(which(ind), arrayInd, dim(x)))
+}
