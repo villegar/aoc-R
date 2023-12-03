@@ -195,7 +195,7 @@ map_schematic <- function(x) {
     get_adjacent_elements(x, idxy_mat[i, 1], idxy_mat[i, 2])
   })
   # find adjacent digits (for each numeric entry)
-  aux <- lapply(seq_along(adjacent_elements), function(i) {
+  lapply_df(seq_along(adjacent_elements), function(i) {
     # extract the i-th matrix with adjacent elements
     adj_el_ith <- adjacent_elements[[i]]
     # extract global indices (in reference to the large data frame)
@@ -234,11 +234,8 @@ map_schematic <- function(x) {
     out_df <- data.frame(row = idx[adj_el_ith_num_idx[ ,1]],
                          number = as.numeric(numbers_wo_na))
     # extract unique values
-    do.call(rbind, by(out_df, out_df$row, unique))
+    by_df(out_df, out_df$row, unique)
   })
-  out_df <- do.call(rbind, aux)
-  rownames(out_df) <- NULL
-  out_df
 }
 
 #' Map schematic to extract numeric values adjacent to the gear symbol, `*`,
@@ -258,7 +255,7 @@ map_schematic_gears <- function(x) {
     get_adjacent_elements(x, idxy_mat[i, 1], idxy_mat[i, 2])
   })
   # find adjacent digits (for each numeric entry)
-  aux <- lapply(seq_along(adjacent_elements), function(i) {
+  lapply_df(seq_along(adjacent_elements), function(i) {
     # extract the i-th matrix with adjacent elements
     adj_el_ith <- adjacent_elements[[i]]
     # extract global indices (in reference to the large data frame)
@@ -297,7 +294,7 @@ map_schematic_gears <- function(x) {
     out_df <- data.frame(row = idx[adj_el_ith_num_idx[ ,1]],
                          number = as.numeric(numbers_wo_na))
     # extract unique values
-    unique_df <- do.call(rbind, by(out_df, out_df$row, unique))
+    unique_df <- by_df(out_df, out_df$row, unique)
     if (nrow(unique_df) == 2) {
       summary_df <- data.frame(
         gear_id = paste0(unique_df$number, collapse = "-"),
@@ -310,9 +307,6 @@ map_schematic_gears <- function(x) {
     }
     return(data.frame())
   })
-  out_df <- do.call(rbind, aux)
-  rownames(out_df) <- NULL
-  out_df
 }
 
 
