@@ -26,7 +26,9 @@ load_real_data <- function(day = "00") {
 #' @return Data frame with the output of `lapply`
 #' @export
 lapply_df <- function(X, FUN, ..., bind_fx = rbind) {
-  do.call(bind_fx, lapply(X, FUN, ...))
+  out_df <- do.call(bind_fx, lapply(X, FUN, ...))
+  rownames(out_df) <- NULL
+  out_df
 }
 
 #' Wrapper for `by` that returns a data frame
