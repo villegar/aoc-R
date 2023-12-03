@@ -189,7 +189,7 @@ map_schematic <- function(x) {
   # find indices of non-numeric characters
   idxy <- matrix(grepl("\\D", x), ncol = ncol(x))
   # find matrix subscripts of those elements (if any)
-  idxy_mat <- get_matrix_subscripts(x, idxy)
+  idxy_mat <- ind2sub(x, idxy)
   # get adjacent elements for each matrix subscript pair
   adjacent_elements <- lapply(seq_len(nrow(idxy_mat)), function(i) {
     get_adjacent_elements(x, idxy_mat[i, 1], idxy_mat[i, 2])
@@ -207,7 +207,7 @@ map_schematic <- function(x) {
     if (!any(adj_el_ith_num))
       return(data.frame())
     # get matrix subscripts
-    adj_el_ith_num_idx <- get_matrix_subscripts(adj_el_ith_num, adj_el_ith_num)
+    adj_el_ith_num_idx <- ind2sub(adj_el_ith_num, adj_el_ith_num)
     # map the "local" indices to global (schematic data frame) equivalent
     adj_el_ith_num_idx_schema <- lapply(seq_len(nrow(adj_el_ith_num_idx)),
                                         function(i) {
@@ -252,7 +252,7 @@ map_schematic_gears <- function(x) {
   # find indices of non-numeric characters
   idxy <- matrix(grepl("\\D", x), ncol = ncol(x))
   # find matrix subscripts of those elements (if any)
-  idxy_mat <- get_matrix_subscripts(x, idxy)
+  idxy_mat <- ind2sub(x, idxy)
   # get adjacent elements for each matrix subscript pair
   adjacent_elements <- lapply(seq_len(nrow(idxy_mat)), function(i) {
     get_adjacent_elements(x, idxy_mat[i, 1], idxy_mat[i, 2])
@@ -270,7 +270,7 @@ map_schematic_gears <- function(x) {
     if (!any(adj_el_ith_num))
       return(data.frame())
     # get matrix subscripts
-    adj_el_ith_num_idx <- get_matrix_subscripts(adj_el_ith_num, adj_el_ith_num)
+    adj_el_ith_num_idx <- ind2sub(adj_el_ith_num, adj_el_ith_num)
     # map the "local" indices to global (schematic data frame) equivalent
     adj_el_ith_num_idx_schema <- lapply(seq_len(nrow(adj_el_ith_num_idx)),
                                         function(i) {

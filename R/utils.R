@@ -124,27 +124,25 @@ last_true_element <- function(x, i) {
   return(i - 1)
 }
 
-#' Convert 2D subscript to linear
+#' Convert matrix subscripts to a linear subscript
 #'
 #' @param x 2D object.
 #' @param i Reference row.
 #' @param j Reference column.
 #'
-#' @return Numeric value with linear index.
+#' @return Numeric value with linear subscript.
 #' @export
-get_linear_subscripts <- function(x, i, j) {
+sub2ind <- function(x, i, j) {
   (i - 1) * nrow(x) + j
 }
 
-#' Convert linear subscript to 2D
+#' Convert a linear subscript to matrix subscripts
 #'
 #' @param x 2D object.
-#' @param ind Numeric value with linear index
+#' @param ind Numeric value with linear subscript.
 #'
-#' @return 2D array with row and column indices.
+#' @return 2D array with row and column subscripts.
 #' @export
-get_matrix_subscripts <- function(x, ind) {
+ind2sub <- function(x, ind) {
   data.frame(i = row(x)[ind], j = col(x)[ind])
-  # arrayInd(ind, .dim = dim(x))
-  # t(sapply(which(ind), arrayInd, dim(x)))
 }
