@@ -17,6 +17,30 @@ load_real_data <- function(day = "00") {
 
 }
 
+#' Wrapper for `lapply` that returns a data frame
+#'
+#' @inheritParams base::lapply
+#' @inheritDotParams base::lapply
+#' @param bind_fx Binding function for the output (e.g., `rbind` or `cbind`).
+#'
+#' @return Data frame with the output of `lapply`
+#' @export
+lapply_df <- function(X, FUN, ..., bind_fx = rbind) {
+  do.call(bind_fx, lapply(X, FUN, ...))
+}
+
+#' Wrapper for `by` that returns a data frame
+#'
+#' @inheritParams base::by
+#' @inheritDotParams base::by
+#' @param bind_fx Binding function for the output (e.g., `rbind` or `cbind`).
+#'
+#' @return Data frame with the output of `by`
+#' @export
+by_df <- function(data, INDICES, FUN, ..., simplify = TRUE, bind_fx = rbind) {
+  do.call(bind_fx, by(data, INDICES, FUN, ..., simplify = simplify))
+}
+
 #' Get adjacent indices
 #'
 #' @param x Origin index.
