@@ -89,18 +89,38 @@
 #' @export
 #' @examples
 #' f04a(example_data_04())
-#' f04b()
+#' f04b(example_data_04())
 f04a <- function(x) {
-  parsed_card <- parse_card(x)
-  scored_card <- score_card(parsed_card)
-  sum(scored_card, na.rm = TRUE)
+  # parse scratch cards into lists
+  parsed_cards <- parse_card(x)
+  # score scratch cards
+  scored_cards <- score_card(parsed_cards)
+  # compute sum of the scores obtained
+  sum(scored_cards, na.rm = TRUE)
 }
 
 
 #' @rdname day04
 #' @export
 f04b <- function(x) {
-
+  # parse scratch cards into lists
+  parsed_cards <- parse_card(x)
+  # create vector with 1s (numbers of initial scratch cards)
+  cards_won <- rep(1, length(x))
+  # loop through the cards to find bonus cards
+  for (i in seq_along(cards_won)) {
+    # get winner cards
+    winner_count <- winner_numbers(parsed_cards[i])
+    # loop through the bonus cards and update counts obtained
+    # `i` represents the current card into play
+    # `i + j` represents the position of a bonus card in reference to the
+    # current card
+    for (j in seq_len(winner_count)) {
+      cards_won[[i + j]] <- cards_won[[i + j]] + cards_won[[i]]
+    }
+  }
+  # compute sum of scratch cards
+  sum(cards_won, na.rm = TRUE)
 }
 
 parse_card <- function(x) {
@@ -115,14 +135,14 @@ parse_card <- function(x) {
   })
 }
 
-score_card <- function(x) {
+winner_numbers <- function(x) {
   sapply(x, function(card) {
-    idx <- card$obtained %in% card$winner
-    if (sum(idx) < 1)
-      return(0)
-    scoring <- c(1, rep(2, times = sum(idx) - 1))
-    prod(scoring)
+    sum(card$obtained %in% card$winner, na.rm = TRUE)
   })
+}
+
+score_card <- function(x) {
+  floor(2 ^ (winner_numbers(x) - 1))
 }
 
 #' @param example Which example data to use (by position or name). Defaults to
