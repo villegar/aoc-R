@@ -206,7 +206,30 @@ f05a <- function(x) {
 #' @rdname day05
 #' @export
 f05b <- function(x) {
-
+  # x_ <- x
+  # x <- paste0(x, collapse = "\n")
+  seed_ranges <- parse_seed_ranges(x)
+  N <- 1E5
+  tictoc::tic()
+  # 896125601
+  locations <- sapply(seq_len(nrow(seed_ranges))[1],
+         function(i) {
+           min_location <- Inf
+           seed_count <- 0
+           while (TRUE) {
+             target <- seed_ranges$destination[i] + seq_len(N) - 1 + seed_count
+             target <- target[target <= seed_ranges$max[i]]
+             if (length(target) < 1)
+               break
+             seed_count <- seed_count + N
+             locs <- f05a(c(paste0("seeds:",
+                                   paste0(target, collapse = ",")
+                                   , "\n"), x[-1]))
+             min_location <- min(min_location, locs, na.rm = TRUE)
+           }
+           return(min_location)
+         })
+  tictoc::toc()
 }
 
 parse_seeds <- function(x) {
@@ -245,6 +268,16 @@ a_to_b <- function(a, b) {
       return(A - b$source[idx] + b$destination[idx])
     }
     A
+  })
+}
+
+b_to_a <- function(a, b) {
+  sapply(b, function(B) {
+    idx <- B >= a$destination & B <= (a$destination + a$length)
+    if (any(idx)) {
+      return(B + a$source[idx] - a$destination[idx])
+    }
+    B
   })
 }
 
