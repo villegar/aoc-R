@@ -2,7 +2,8 @@
 % Please edit documentation in R/day07.R
 \name{cards_strength}
 \alias{cards_strength}
-\title{Calculate the strength of individual cards}
+\title{Calculate the strength of individual cards, see
+\href{https://adventofcode.com/2023/day/7}{day 7 - 2023}}
 \usage{
 cards_strength(x, joker = FALSE)
 }
@@ -15,5 +16,6 @@ cards_strength(x, joker = FALSE)
 Card scores
 }
 \description{
-Calculate the strength of individual cards
+Calculate the strength of individual cards, see
+\href{https://adventofcode.com/2023/day/7}{day 7 - 2023}
 }
