@@ -15,9 +15,10 @@ base R (and trying to stay away from the pipe, `|>`, so the code runs with older
 This repo is based on a template created by Matt Dray, [aoc.rstats.template](https://github.com/matt-dray/aoc.rstats.template); which was inspired by [YiWen's Advent of Code (AOC) template repository for Python](https://github.com/yiwen-h/aoc_python_template); originally created to help support a Coffee & Coding session, November 2023.
 
 ## Daily meme
-![](https://i.redd.it/8v91f39b0f4c1.png)
+![](https://i.redd.it/lu6qbfblgt4c1.jpg)
 
-**Source**: [https://www.reddit.com/r/adventofcode/comments/18b560a](https://www.reddit.com/r/adventofcode/comments/18b560a/2023_day_5_part_2_cpu_goes_brrr/)
+**Source**: [https://www.reddit.com/r/adventofcode/comments/18cpf4z](https://www.reddit.com/r/adventofcode/comments/18cpf4z/2023_day_7_theres_always_day_8/)
 
 #### Log
 - Day 3: [image](https://i.redd.it/etb8fgoot14c1.jpg) | [source](https://www.reddit.com/r/adventofcode/comments/189q1d2/difficulty_is_all_over_the_place_isnt_it/)
+- Day 5: [image](https://i.redd.it/8v91f39b0f4c1.png) | [source](https://www.reddit.com/r/adventofcode/comments/18b560a/2023_day_5_part_2_cpu_goes_brrr/)
