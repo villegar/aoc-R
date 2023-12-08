@@ -139,6 +139,13 @@ f06b <- function(x) {
   winning_options(time, distance)
 }
 
+#' Compute winning options
+#'
+#' @param time Numeric value with time.
+#' @param distance Numeric value with distance.
+#'
+#' @return Sum of the winning options.
+#' @export
 winning_options <- function(time, distance) {
   speeds <- c(0, seq_len(time)) # charging time * 1 mm/ms
   sum(speeds * rev(speeds) - 1 >= distance)
