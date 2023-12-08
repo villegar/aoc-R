@@ -148,3 +148,19 @@ sub2ind <- function(x, i, j) {
 ind2sub <- function(x, ind) {
   data.frame(i = row(x)[ind], j = col(x)[ind])
 }
+
+#' Parse numbers from text section
+#'
+#' @param x String of characters with target text.
+#' @param header String with the header of the target section.
+#'
+#' @return Numeric vector.
+#' @export
+#'
+#' @examples
+#' parse_numbers("Distance:  9  40  200", "Distance:")
+parse_numbers <- function(x, header = "") {
+  section <- regmatches(x, regexpr(paste0(header, "[0-9 \n]+"), x))
+  section_2 <- trimws(gsub("\\s+", " ", gsub("\\D", " ", section)))
+  as.numeric(strsplit(section_2, " ")[[1]])
+}

@@ -176,7 +176,7 @@
 #' @examples
 #' f05a(example_data_05())
 #' f05b(strsplit(example_data_05(), "\n",)[[1]])
-f05a <- function(x, all = FALSE) {
+f05a <- function(x) {
   x <- paste0(x, collapse = "\n")
   initial_seeds <- parse_seeds(x)
   seed_to_soil <- parse_map(x, "seed-to-soil")
@@ -199,26 +199,37 @@ f05a <- function(x, all = FALSE) {
   for (i in seq_along(mappings)) {
     target <- a_to_b(target, mappings[[i]])
   }
-  if (all)
-    return(target)
   min(target)
 }
 
 #' @rdname day05
 #' @export
 f05b <- function(x) {
+  x <- paste0(x, collapse = "\n")
   seed_ranges <- parse_seed_ranges(x)
   locations <- Inf
   for (s in seq_len(nrow(seed_ranges))) {
     locations <-
       c(locations,
-        find_min_location(seed_ranges$start[s], seed_ranges$length[s]))
+        find_min_location(strsplit(x, "\n")[[1]],
+                          seed_ranges$start[s], seed_ranges$length[s]))
   }
   min(locations, na.rm = TRUE)
 }
 
-# adapted from https://www.reddit.com/r/adventofcode/comments/18buwiz/comment/kc78ou6/
-find_min_location <- function(start, length) {
+
+#' Find minimum locations for seed ranges
+#'
+#' Find minimum locations for seed ranges. Adapted from
+#' \url{https://www.reddit.com/r/adventofcode/comments/18buwiz/comment/kc78ou6/}
+#'
+#' @param x String with Almanac.
+#' @param start Starting point of the seed range.
+#' @param length Length of the seed range.
+#'
+#' @return Minimum location for the given range.
+#' @export
+find_min_location <- function(x, start, length) {
   min_location <- Inf # default minimum location
   if (length == 1) {
     return(min(f05a(c(paste0("seeds:", start, "\n"), x[-1])),
@@ -237,26 +248,36 @@ find_min_location <- function(start, length) {
 
   # find location for first half of the range: start --- N
   if (start_location + N != mid_point_range_location) {
-    min_location <- find_min_location(start, N)
+    min_location <- find_min_location(x, start, N)
   }
   # find location starting at mid-point: mid-point --- (length - N)
   if (mid_point_range_location + (length - N) != end_location) {
     min_location <- min(min_location,
-                        find_min_location(mid_point_range, (length - N)))
+                        find_min_location(x, mid_point_range, (length - N)))
   }
   return(min_location)
 }
 
+#' Parse seeds from Almanac
+#'
+#' @param x String with Almanac.
+#'
+#' @return Numeric vector with the seeds.
+#' @export
 parse_seeds <- function(x) {
   section <- regmatches(x, regexpr("seeds:[0-9 \n]+", x))
   section_2 <- trimws(gsub("  ", " ", gsub("\\D", " ", section)))
   as.numeric(strsplit(section_2, " ")[[1]])
 }
 
+#' Parse seed ranges from Almanac
+#'
+#' @param x String with Almanac.
+#'
+#' @return Data frame with seed ranges.
+#' @export
 parse_seed_ranges <- function(x) {
-  section <- regmatches(x, regexpr("seeds:[0-9 \n]+", x))
-  section_2 <- trimws(gsub("  ", " ", gsub("\\D", " ", section)))
-  mapping_numbers <- as.numeric(strsplit(section_2, " ")[[1]])
+  mapping_numbers <- parse_seeds(x)
   mapping_df <- as.data.frame(matrix(mapping_numbers, ncol = 2, byrow = TRUE))
   mapping_df$max <- sapply(seq_len(nrow(mapping_df)),
                            \(i) mapping_df$V1[i] + mapping_df$V2[i] - 1)
@@ -264,6 +285,13 @@ parse_seed_ranges <- function(x) {
   mapping_df
 }
 
+#' Parse mapping from Almanac
+#'
+#' @param x String with Almanac.
+#' @param header String with the header of the mapping in the Almanac.
+#'
+#' @return Data frame with mapping.
+#' @export
 parse_map <- function(x, header = NULL) {
   pattern <- paste0(header, " map:[0-9 \n]+")
   section <- regmatches(x, regexpr(pattern, x))
@@ -276,6 +304,13 @@ parse_map <- function(x, header = NULL) {
   mapping_df
 }
 
+#' Map between mappings
+#'
+#' @param a Numeric vector with source numbers.
+#' @param b Data frame with mapping.
+#'
+#' @return Numeric vector with destination numbers.
+#' @export
 a_to_b <- function(a, b) {
   sapply(a, function(A) {
     idx <- A >= b$source & A <= b$max
