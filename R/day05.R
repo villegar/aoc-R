@@ -175,8 +175,8 @@
 #' @export
 #' @examples
 #' f05a(example_data_05())
-#' f05b()
-f05a <- function(x) {
+#' f05b(strsplit(example_data_05(), "\n",)[[1]])
+f05a <- function(x, all = FALSE) {
   x <- paste0(x, collapse = "\n")
   initial_seeds <- parse_seeds(x)
   seed_to_soil <- parse_map(x, "seed-to-soil")
@@ -199,37 +199,52 @@ f05a <- function(x) {
   for (i in seq_along(mappings)) {
     target <- a_to_b(target, mappings[[i]])
   }
+  if (all)
+    return(target)
   min(target)
 }
-
 
 #' @rdname day05
 #' @export
 f05b <- function(x) {
-  # x_ <- x
-  # x <- paste0(x, collapse = "\n")
   seed_ranges <- parse_seed_ranges(x)
-  N <- 1E5
-  tictoc::tic()
-  # 896125601
-  locations <- sapply(seq_len(nrow(seed_ranges))[1],
-         function(i) {
-           min_location <- Inf
-           seed_count <- 0
-           while (TRUE) {
-             target <- seed_ranges$destination[i] + seq_len(N) - 1 + seed_count
-             target <- target[target <= seed_ranges$max[i]]
-             if (length(target) < 1)
-               break
-             seed_count <- seed_count + N
-             locs <- f05a(c(paste0("seeds:",
-                                   paste0(target, collapse = ",")
-                                   , "\n"), x[-1]))
-             min_location <- min(min_location, locs, na.rm = TRUE)
-           }
-           return(min_location)
-         })
-  tictoc::toc()
+  locations <- Inf
+  for (s in seq_len(nrow(seed_ranges))) {
+    locations <-
+      c(locations,
+        find_min_location(seed_ranges$start[s], seed_ranges$length[s]))
+  }
+  min(locations, na.rm = TRUE)
+}
+
+# adapted from https://www.reddit.com/r/adventofcode/comments/18buwiz/comment/kc78ou6/
+find_min_location <- function(start, length) {
+  min_location <- Inf # default minimum location
+  if (length == 1) {
+    return(min(f05a(c(paste0("seeds:", start, "\n"), x[-1])),
+               f05a(c(paste0("seeds:", start + 1, "\n"), x[-1]))))
+  }
+
+  # compute step size as half of the length
+  N <- floor(length / 2)
+  # find the mid-point = start + step size
+  mid_point_range <- start + N
+
+  # find smallest location for: start, mid and end points of range
+  start_location <- f05a(c(paste0("seeds:", start, "\n"), x[-1]))
+  mid_point_range_location <- f05a(c(paste0("seeds:", mid_point_range, "\n"), x[-1]))
+  end_location <- f05a(c(paste0("seeds:", start + length, "\n"), x[-1]))
+
+  # find location for first half of the range: start --- N
+  if (start_location + N != mid_point_range_location) {
+    min_location <- find_min_location(start, N)
+  }
+  # find location starting at mid-point: mid-point --- (length - N)
+  if (mid_point_range_location + (length - N) != end_location) {
+    min_location <- min(min_location,
+                        find_min_location(mid_point_range, (length - N)))
+  }
+  return(min_location)
 }
 
 parse_seeds <- function(x) {
@@ -245,7 +260,7 @@ parse_seed_ranges <- function(x) {
   mapping_df <- as.data.frame(matrix(mapping_numbers, ncol = 2, byrow = TRUE))
   mapping_df$max <- sapply(seq_len(nrow(mapping_df)),
                            \(i) mapping_df$V1[i] + mapping_df$V2[i] - 1)
-  colnames(mapping_df) <- c("destination", "source", "max")
+  colnames(mapping_df) <- c("start", "length", "max")
   mapping_df
 }
 
@@ -270,17 +285,6 @@ a_to_b <- function(a, b) {
     A
   })
 }
-
-b_to_a <- function(a, b) {
-  sapply(b, function(B) {
-    idx <- B >= a$destination & B <= (a$destination + a$length)
-    if (any(idx)) {
-      return(B + a$source[idx] - a$destination[idx])
-    }
-    B
-  })
-}
-
 
 #' @param example Which example data to use (by position or name). Defaults to
 #'   1.
