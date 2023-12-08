@@ -25,6 +25,9 @@
     <loc>https://aocR.robertovillegas-diaz.com/reference/by_df.html</loc>
   </url>
   <url>
+    <loc>https://aocR.robertovillegas-diaz.com/reference/cards_strength.html</loc>
+  </url>
+  <url>
     <loc>https://aocR.robertovillegas-diaz.com/reference/day01.html</loc>
   </url>
   <url>
@@ -41,6 +44,9 @@
   </url>
   <url>
     <loc>https://aocR.robertovillegas-diaz.com/reference/day06.html</loc>
+  </url>
+  <url>
+    <loc>https://aocR.robertovillegas-diaz.com/reference/day07.html</loc>
   </url>
   <url>
     <loc>https://aocR.robertovillegas-diaz.com/reference/f01_helper.html</loc>
@@ -62,6 +68,9 @@
   </url>
   <url>
     <loc>https://aocR.robertovillegas-diaz.com/reference/get_indices.html</loc>
+  </url>
+  <url>
+    <loc>https://aocR.robertovillegas-diaz.com/reference/hand_strength.html</loc>
   </url>
   <url>
     <loc>https://aocR.robertovillegas-diaz.com/reference/ind2sub.html</loc>
@@ -110,6 +119,12 @@
   </url>
   <url>
     <loc>https://aocR.robertovillegas-diaz.com/reference/reverse_string.html</loc>
+  </url>
+  <url>
+    <loc>https://aocR.robertovillegas-diaz.com/reference/split_deck.html</loc>
+  </url>
+  <url>
+    <loc>https://aocR.robertovillegas-diaz.com/reference/split_hand.html</loc>
   </url>
   <url>
     <loc>https://aocR.robertovillegas-diaz.com/reference/sub2ind.html</loc>
