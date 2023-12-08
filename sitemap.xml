@@ -16,6 +16,9 @@
     <loc>https://aocR.robertovillegas-diaz.com/index.html</loc>
   </url>
   <url>
+    <loc>https://aocR.robertovillegas-diaz.com/reference/a_to_b.html</loc>
+  </url>
+  <url>
     <loc>https://aocR.robertovillegas-diaz.com/reference/aoc_solutions.html</loc>
   </url>
   <url>
@@ -34,7 +37,16 @@
     <loc>https://aocR.robertovillegas-diaz.com/reference/day04.html</loc>
   </url>
   <url>
+    <loc>https://aocR.robertovillegas-diaz.com/reference/day05.html</loc>
+  </url>
+  <url>
+    <loc>https://aocR.robertovillegas-diaz.com/reference/day06.html</loc>
+  </url>
+  <url>
     <loc>https://aocR.robertovillegas-diaz.com/reference/f01_helper.html</loc>
+  </url>
+  <url>
+    <loc>https://aocR.robertovillegas-diaz.com/reference/find_min_location.html</loc>
   </url>
   <url>
     <loc>https://aocR.robertovillegas-diaz.com/reference/find_minimum_set.html</loc>
@@ -79,7 +91,19 @@
     <loc>https://aocR.robertovillegas-diaz.com/reference/parse_game.html</loc>
   </url>
   <url>
+    <loc>https://aocR.robertovillegas-diaz.com/reference/parse_map.html</loc>
+  </url>
+  <url>
+    <loc>https://aocR.robertovillegas-diaz.com/reference/parse_numbers.html</loc>
+  </url>
+  <url>
     <loc>https://aocR.robertovillegas-diaz.com/reference/parse_schematic.html</loc>
+  </url>
+  <url>
+    <loc>https://aocR.robertovillegas-diaz.com/reference/parse_seed_ranges.html</loc>
+  </url>
+  <url>
+    <loc>https://aocR.robertovillegas-diaz.com/reference/parse_seeds.html</loc>
   </url>
   <url>
     <loc>https://aocR.robertovillegas-diaz.com/reference/replace_chrs.html</loc>
@@ -92,5 +116,8 @@
   </url>
   <url>
     <loc>https://aocR.robertovillegas-diaz.com/reference/validate_hands.html</loc>
+  </url>
+  <url>
+    <loc>https://aocR.robertovillegas-diaz.com/reference/winning_options.html</loc>
   </url>
 </urlset>
