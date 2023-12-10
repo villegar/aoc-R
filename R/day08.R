@@ -78,35 +78,78 @@
 f08a <- function(x) {
   route <- trimws(x[1])
   parsed_network <- parse_network(x)
-  parsed_network_sorted <- parsed_network[order(parsed_network$entry), ]
-  possible_paths <- find_possible_paths(parsed_network_sorted)
-  aux <- possible_paths[names(possible_paths) == "ZZZ"]
-  if (grepl(pattern = "\\|", aux)) {
-    aux_2 <- strsplit(aux, "\\|R")[[1]]
-    aux <- c(paste0(aux_2, collapse = ""), paste0("R", aux_2[-1]))
-  }
-  aux_2 <- aux[sapply(aux, grepl, x = route)]
-  if (route == aux_2)
-      return(nchar(aux_2))
-  replacements <- nchar(aux_2)
-  while (TRUE) {
-    reg_match <- regexpr(paste0(aux_2), route)
-    if (reg_match > 0)
-      replacements <- replacements + nchar(aux_2)
-
-    route <- gsub(aux_2, "", route)
-    if (nchar(route) == 0)
-      break
-    if (nchar(route) < nchar(aux_2)) {
-      if (reg_match == 1) {
-        route <- paste0("L", route)
+  target <- "AAA"
+  labels <- c(target)
+  steps <- 0
+  while (target != "ZZZ") {
+    for (i in nchar(route)) {
+      direction <- substr(route, start = i, stop = i)
+      aux <- parsed_network[parsed_network$entry == target, ]
+      if (direction == "L") {
+        target <- aux$left
       } else {
-        route <- paste0(route, "R")
+        target <- aux$right
       }
+      labels <- c(labels, target)
     }
+    steps <- steps + nchar(route)
   }
-  replacements
 }
+
+#' @rdname day08
+#' @export
+f08b <- function(x) {
+  route <- trimws(x[1])
+  parsed_network <- parse_network(x)
+  target <- parsed_network$entry[grepl("A$", parsed_network$entry)]
+  goals <- parsed_network$entry[grepl("Z$", parsed_network$entry)]
+  labels <- c(target)
+  steps <- 0
+  while (!all(target %in% goals)) {
+    for (i in nchar(route)) {
+      target <- sapply(target, function(t) {
+        direction <- substr(route, start = i, stop = i)
+        aux <- parsed_network[parsed_network$entry == t, ]
+        if (direction == "L") {
+          return(aux$left)
+        } else {
+          return(aux$right)
+        }
+      })
+
+      labels <- c(labels, list(target))
+    }
+    steps <- steps + nchar(route)
+  }
+  # possible_paths <- find_possible_paths(parsed_network_sorted)
+  # aux <- possible_paths[names(possible_paths) == "ZZZ"]
+  # if (grepl(pattern = "\\|", aux)) {
+  #   aux_2 <- strsplit(aux, "\\|R")[[1]]
+  #   aux <- c(paste0(aux_2, collapse = ""), paste0("R", aux_2[-1]))
+  # }
+  # aux_2 <- aux[sapply(aux, grepl, x = route)]
+  # if (route == aux_2)
+  #     return(nchar(aux_2))
+  # replacements <- nchar(aux_2)
+  # while (TRUE) {
+  #   reg_match <- regexpr(paste0(aux_2), route)
+  #   if (reg_match > 0)
+  #     replacements <- replacements + nchar(aux_2)
+  #
+  #   route <- gsub(aux_2, "", route)
+  #   if (nchar(route) == 0)
+  #     break
+  #   if (nchar(route) < nchar(aux_2)) {
+  #     if (reg_match == 1) {
+  #       route <- paste0("L", route)
+  #     } else {
+  #       route <- paste0(route, "R")
+  #     }
+  #   }
+  # }
+  # replacements
+}
+
 
 find_possible_paths <- function(x) {
   # create empty matrix of paths
@@ -158,34 +201,30 @@ find_possible_paths <- function(x) {
   return(paths_mat[aaa_idx, nchar(paths_mat[aaa_idx, ]) > 0])
 }
 
-follow_trail <- function(x, new_entry) {
+follow_trail <- function(x, next_entry) {
   aux <- x[next_entry, ]
   aux_2 <- aux[nchar(aux) > 0]
   out <- data.frame(
     left = "",
-    right = "",
+    right = ""
   )
   if (length(aux_2) < 1)
-    break
+    return("")
   if ("L" %in% aux_2) { # left
-    j <- which(names(aux_2[aux_2 %in% "L"]) == entries)
-    x[aaa_idx, j] <- paste0(origin_df[i, ]$start, "L")
+    # j <- which(names(aux_2[aux_2 %in% "L"]) == entries)
+    # x[aaa_idx, j] <- paste0(origin_df[i, ]$start, "L")
+    out$left <- paste0(out$left,
+                       "L",
+                       follow_trail(x, names(aux_2[aux_2 %in% "L"])))
   }
   if ("R" %in% aux_2) { # right
-    j <- which(names(aux_2[aux_2 %in% "R"]) == entries)
-    x[aaa_idx, j] <- paste0(origin_df[i, ]$start, "R")
+    # j <- which(names(aux_2[aux_2 %in% "R"]) == entries)
+    # x[aaa_idx, j] <- paste0(origin_df[i, ]$start, "R")
+    out$right <- paste0(out$right,
+                        "R",
+                        follow_trail(x, names(aux_2[aux_2 %in% "R"])))
   }
-}
-
-#' @rdname day08
-#' @export
-f08b <- function(x) {
-
-}
-
-
-f08_helper <- function(x) {
-
+  return("")
 }
 
 parse_network <- function(x) {
