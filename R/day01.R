@@ -112,19 +112,6 @@ f01_helper <- function(first_digit, last_digit) {
   sum(cali_vals_num, na.rm = TRUE)
 }
 
-#' Reverse a string
-#'
-#' @param x Original string.
-#'
-#' @return Reversed string
-#' @export
-#'
-#' @examples
-#' reverse_string("ouch")
-reverse_string <- function(x) {
-  intToUtf8(rev(utf8ToInt(x)))
-}
-
 #' Lookup digits in a string
 #'
 #' Lookup digits in a string, either text (e.g., 'one', 'two', ...) or numerical
