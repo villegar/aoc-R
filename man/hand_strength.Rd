@@ -2,7 +2,8 @@
 % Please edit documentation in R/day07.R
 \name{hand_strength}
 \alias{hand_strength}
-\title{Calculate the strength of a group of cards / a hand}
+\title{Calculate the strength of a group of cards / a hand, see
+\href{https://adventofcode.com/2023/day/7}{day 7 - 2023}}
 \usage{
 hand_strength(x, joker = FALSE)
 }
@@ -15,5 +16,6 @@ hand_strength(x, joker = FALSE)
 Hand score
 }
 \description{
-Calculate the strength of a group of cards / a hand
+Calculate the strength of a group of cards / a hand, see
+\href{https://adventofcode.com/2023/day/7}{day 7 - 2023}
 }
