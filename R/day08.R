@@ -74,168 +74,82 @@
 #' @examples
 #' f08a(example_data_08(1))
 #' f08a(example_data_08(2))
-#' f08b()
+#' f08b(example_data_08(3))
 f08a <- function(x) {
+  # extract network route
   route <- trimws(x[1])
+  # parse network map
   parsed_network <- parse_network(x)
-  target <- "AAA"
-  labels <- c(target)
-  steps <- 0
-  while (target != "ZZZ") {
-    for (i in nchar(route)) {
-      direction <- substr(route, start = i, stop = i)
-      aux <- parsed_network[parsed_network$entry == target, ]
-      if (direction == "L") {
-        target <- aux$left
-      } else {
-        target <- aux$right
-      }
-      labels <- c(labels, target)
-    }
-    steps <- steps + nchar(route)
-  }
+  # find numbers of steps from 'AAA' to 'ZZZ'
+  traverse_map(route, parsed_network, "AAA", "ZZZ")$steps
 }
 
 #' @rdname day08
 #' @export
 f08b <- function(x) {
+  # extract network route
   route <- trimws(x[1])
+  # parse network map
   parsed_network <- parse_network(x)
-  target <- parsed_network$entry[grepl("A$", parsed_network$entry)]
-  goals <- parsed_network$entry[grepl("Z$", parsed_network$entry)]
-  labels <- c(target)
-  steps <- 0
-  while (!all(target %in% goals)) {
-    for (i in nchar(route)) {
-      target <- sapply(target, function(t) {
-        direction <- substr(route, start = i, stop = i)
-        aux <- parsed_network[parsed_network$entry == t, ]
-        if (direction == "L") {
-          return(aux$left)
-        } else {
-          return(aux$right)
-        }
-      })
+  # extract starting points, start with 'A'
+  starts <- parsed_network$entry[grepl("A$", parsed_network$entry)]
+  # extract ending points / targets, end with 'Z'
+  targets <- parsed_network$entry[grepl("Z$", parsed_network$entry)]
+  # find the number of steps required for each starting point
+  steps <- sapply(seq_along(starts), function(i) {
+    traverse_map(route, parsed_network, starts[i], targets)$steps
+  })
+  # find the Least Common Multiple of the steps, that is, how many times
+  # the network has to be traversed for all the starting points to reach
+  # a node ending in 'Z' at the same time.
+  Reduce(lcm, steps)
+}
 
-      labels <- c(labels, list(target))
+#' Traverse network map, see
+#' [day 8 - 2023](https://adventofcode.com/2023/day/8)
+#'
+#' @param route String with route (e.g., 'LR').
+#' @param parsed_network Data frame with parsed network map.
+#' @param start String with starting point.
+#' @param target Vector of strings with targets/end points.
+#'
+#' @return List with various elements resulting from traversing the network.
+#' @export
+traverse_map <- function(route, parsed_network, start, target) {
+  labels <- c(start)
+  steps <- 0
+  while (!any(start %in% target)) {
+    for (i in seq_len(nchar(route))) {
+      direction <- substr(route, start = i, stop = i)
+      aux <- parsed_network[parsed_network$entry == start, ]
+      if (direction == "L") {
+        start <- aux$left
+      } else {
+        start <- aux$right
+      }
+      labels <- c(labels, start)
     }
     steps <- steps + nchar(route)
   }
-  # possible_paths <- find_possible_paths(parsed_network_sorted)
-  # aux <- possible_paths[names(possible_paths) == "ZZZ"]
-  # if (grepl(pattern = "\\|", aux)) {
-  #   aux_2 <- strsplit(aux, "\\|R")[[1]]
-  #   aux <- c(paste0(aux_2, collapse = ""), paste0("R", aux_2[-1]))
-  # }
-  # aux_2 <- aux[sapply(aux, grepl, x = route)]
-  # if (route == aux_2)
-  #     return(nchar(aux_2))
-  # replacements <- nchar(aux_2)
-  # while (TRUE) {
-  #   reg_match <- regexpr(paste0(aux_2), route)
-  #   if (reg_match > 0)
-  #     replacements <- replacements + nchar(aux_2)
-  #
-  #   route <- gsub(aux_2, "", route)
-  #   if (nchar(route) == 0)
-  #     break
-  #   if (nchar(route) < nchar(aux_2)) {
-  #     if (reg_match == 1) {
-  #       route <- paste0("L", route)
-  #     } else {
-  #       route <- paste0(route, "R")
-  #     }
-  #   }
-  # }
-  # replacements
+  list(start = labels[1],
+       target = target,
+       steps = steps,
+       labels = labels)
 }
 
-
-find_possible_paths <- function(x) {
-  # create empty matrix of paths
-  paths_mat <- matrix("", nrow = nrow(x), ncol = nrow(x))
-  # extract unique entries
-  entries <- sort(x$entry)
-  colnames(paths_mat) <-  entries
-  rownames(paths_mat) <-  entries
-  for (i in seq_len(nrow(paths_mat))) {
-    # left
-    j_l <- which(x[i, 2] == entries)
-    if (i != j_l)
-      paths_mat[i, j_l] <- paste0(paths_mat[i, j_l], "L")
-    # right
-    j_r <- which(x[i, 3] == entries)
-    if (j_l == j_r && i != j_l) {
-      paths_mat[i, j_r] <- paste0(paths_mat[i, j_r], "|R")
-    } else if (i != j_r)
-      paths_mat[i, j_r] <- paste0(paths_mat[i, j_r], "R")
-  }
-
-  aaa_idx <- 1 # which(x$entry == "AAA")
-  idx <- nchar(paths_mat[aaa_idx, ]) > 0
-  origin <- paths_mat[aaa_idx, idx]
-
-  origin_df <- data.frame(
-    entry = entries[idx],
-    start = origin
-  )
-
-  for (i in seq_len(nrow(origin_df))) {
-    next_entry <- origin_df[i, ]$entry
-    while(TRUE) {
-      aux <- paths_mat[next_entry, ]
-      aux_2 <- aux[nchar(aux) > 0]
-      if (length(aux_2) < 1)
-        break
-      if ("L" %in% aux_2) { # left
-        j <- which(names(aux_2[aux_2 %in% "L"]) == entries)
-        paths_mat[aaa_idx, j] <- paste0(origin_df[i, ]$start, "L")
-      }
-      if ("R" %in% aux_2) { # right
-        j <- which(names(aux_2[aux_2 %in% "R"]) == entries)
-        paths_mat[aaa_idx, j] <- paste0(origin_df[i, ]$start, "R")
-      }
-      break
-    }
-  }
-  return(paths_mat[aaa_idx, nchar(paths_mat[aaa_idx, ]) > 0])
-}
-
-follow_trail <- function(x, next_entry) {
-  aux <- x[next_entry, ]
-  aux_2 <- aux[nchar(aux) > 0]
-  out <- data.frame(
-    left = "",
-    right = ""
-  )
-  if (length(aux_2) < 1)
-    return("")
-  if ("L" %in% aux_2) { # left
-    # j <- which(names(aux_2[aux_2 %in% "L"]) == entries)
-    # x[aaa_idx, j] <- paste0(origin_df[i, ]$start, "L")
-    out$left <- paste0(out$left,
-                       "L",
-                       follow_trail(x, names(aux_2[aux_2 %in% "L"])))
-  }
-  if ("R" %in% aux_2) { # right
-    # j <- which(names(aux_2[aux_2 %in% "R"]) == entries)
-    # x[aaa_idx, j] <- paste0(origin_df[i, ]$start, "R")
-    out$right <- paste0(out$right,
-                        "R",
-                        follow_trail(x, names(aux_2[aux_2 %in% "R"])))
-  }
-  return("")
-}
-
+#' Parse network map, see
+#' [day 8 - 2023](https://adventofcode.com/2023/day/8)
+#'
+#' @param x String with network map.
+#'
+#' @return Data frame with parsed network map.
+#' @export
 parse_network <- function(x) {
   lapply_df(x, function(path) {
     if (nchar(path) != 16)
       return(data.frame())
     aux <- trimws(strsplit(path, "=")[[1]])
     aux_2 <- trimws(strsplit(aux[2], ",")[[1]])
-    # entry <- regmatches(path, regexpr("^(.*?) ", path))
-    # left <- regmatches(path, regexpr("\\((.*?),", path))
-    # right <- regmatches(path, regexpr(",(.*?)\\)", path))
     data.frame(
       entry = aux[1],
       left = gsub("\\(", "", aux_2[1]),
@@ -267,6 +181,18 @@ example_data_08 <- function(example = 1) {
       "AAA = (BBB, BBB)",
       "BBB = (AAA, ZZZ)",
       "ZZZ = (ZZZ, ZZZ)"
+    ),
+    c = c(
+      "LR",
+      "",
+      "11A = (11B, XXX)",
+      "11B = (XXX, 11Z)",
+      "11Z = (11B, XXX)",
+      "22A = (22B, XXX)",
+      "22B = (22C, 22C)",
+      "22C = (22Z, 22Z)",
+      "22Z = (22B, 22B)",
+      "XXX = (XXX, XXX)"
     )
   )
   l[[example]]
