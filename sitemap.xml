@@ -49,6 +49,9 @@
     <loc>https://aocR.robertovillegas-diaz.com/reference/day07.html</loc>
   </url>
   <url>
+    <loc>https://aocR.robertovillegas-diaz.com/reference/day08.html</loc>
+  </url>
+  <url>
     <loc>https://aocR.robertovillegas-diaz.com/reference/f01_helper.html</loc>
   </url>
   <url>
@@ -70,6 +73,9 @@
     <loc>https://aocR.robertovillegas-diaz.com/reference/get_indices.html</loc>
   </url>
   <url>
+    <loc>https://aocR.robertovillegas-diaz.com/reference/grapes-gcd-grapes.html</loc>
+  </url>
+  <url>
     <loc>https://aocR.robertovillegas-diaz.com/reference/hand_strength.html</loc>
   </url>
   <url>
@@ -83,6 +89,9 @@
   </url>
   <url>
     <loc>https://aocR.robertovillegas-diaz.com/reference/last_true_element.html</loc>
+  </url>
+  <url>
+    <loc>https://aocR.robertovillegas-diaz.com/reference/lcm.html</loc>
   </url>
   <url>
     <loc>https://aocR.robertovillegas-diaz.com/reference/lookup_digit.html</loc>
@@ -101,6 +110,9 @@
   </url>
   <url>
     <loc>https://aocR.robertovillegas-diaz.com/reference/parse_map.html</loc>
+  </url>
+  <url>
+    <loc>https://aocR.robertovillegas-diaz.com/reference/parse_network.html</loc>
   </url>
   <url>
     <loc>https://aocR.robertovillegas-diaz.com/reference/parse_numbers.html</loc>
@@ -128,6 +140,9 @@
   </url>
   <url>
     <loc>https://aocR.robertovillegas-diaz.com/reference/sub2ind.html</loc>
+  </url>
+  <url>
+    <loc>https://aocR.robertovillegas-diaz.com/reference/traverse_map.html</loc>
   </url>
   <url>
     <loc>https://aocR.robertovillegas-diaz.com/reference/validate_hands.html</loc>
