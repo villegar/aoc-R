@@ -122,24 +122,27 @@
 #'
 #' *(Try using `convert_clipboard_html_to_roxygen_md()`)*
 #'
-#' @param x some data
+#' @param x some data.
+#' @param joker Flag to indicate if jokers ('J') are scored differently.
 #' @return For Part One, `f07a(x)` returns .... For Part Two,
 #'   `f07b(x)` returns ....
 #' @export
 #' @examples
 #' f07a(example_data_07())
 #' f07b(example_data_07())
-f07a <- function(x) {
+f07a <- function(x, joker = FALSE) {
   deck <- split_deck(x)
   deck$hand_split <- lapply(deck$hand, split_hand)
-  deck$strength <- sapply(deck$hand_split, hand_strength)
+  deck$strength <- sapply(deck$hand_split, hand_strength, joker = joker)
   sorted_hands <- lapply_df(unique(deck$strength),
                             function(i) {
                               aux <- deck[deck$strength == i, ]
                               aux$id <- seq_len(nrow(aux))
                               if (nrow(aux) == 1)
                                 return(aux)
-                              aux_2 <- lapply_df(aux$hand_split, cards_strength)
+                              aux_2 <- lapply_df(aux$hand_split,
+                                                 cards_strength,
+                                                 joker = joker)
                               aux_3 <- aux[order(aux_2[, 1], # sort by 1st card
                                                  aux_2[, 2], # sort by 2nd card
                                                  aux_2[, 3], # sort by 3rd card
@@ -158,33 +161,11 @@ f07a <- function(x) {
 #' @rdname day07
 #' @export
 f07b <- function(x) {
-  deck <- split_deck(x)
-  deck$hand_split <- lapply(deck$hand, split_hand)
-  deck$strength <- sapply(deck$hand_split, hand_strength, joker = TRUE)
-  sorted_hands <- lapply_df(unique(deck$strength),
-                            function(i) {
-                              aux <- deck[deck$strength == i, ]
-                              aux$id <- seq_len(nrow(aux))
-                              if (nrow(aux) == 1)
-                                return(aux)
-                              aux_2 <- lapply_df(aux$hand_split,
-                                                 cards_strength,
-                                                 joker = TRUE)
-                              aux_3 <- aux[order(aux_2[, 1], # sort by 1st card
-                                                 aux_2[, 2], # sort by 2nd card
-                                                 aux_2[, 3], # sort by 3rd card
-                                                 aux_2[, 4], # sort by 4th card
-                                                 aux_2[, 5], # sort by 5th card
-                                                 decreasing = TRUE), ]
-                              aux_3$id <- seq_len(nrow(aux))
-                              return(aux_3)
-                            })
-  sorted_hands_2 <- sorted_hands[order(sorted_hands$strength,
-                                       decreasing = TRUE), ]
-  sum(sorted_hands_2$bid * rev(seq_along(sorted_hands_2$hand)))
+  return(f07a(x, joker = TRUE))
 }
 
-#' Calculate the strength of individual cards
+#' Calculate the strength of individual cards, see
+#' [day 7 - 2023](https://adventofcode.com/2023/day/7)
 #'
 #' @param x Vector with cards (strings).
 #' @param joker Flag to indicate if jokers ('J') are scored differently.
@@ -199,7 +180,8 @@ cards_strength <- function(x, joker = FALSE) {
   rev(seq_along(cards))[idx]
 }
 
-#' Calculate the strength of a group of cards / a hand
+#' Calculate the strength of a group of cards / a hand, see
+#' [day 7 - 2023](https://adventofcode.com/2023/day/7)
 #'
 #' @param x Vector with cards (strings).
 #' @param joker Flag to indicate if jokers ('J') are scored differently.
@@ -250,7 +232,8 @@ hand_strength <- function(x, joker = FALSE) {
   return(0)
 }
 
-#' Split string with hands of cards
+#' Split string with hands of cards, see
+#' [day 7 - 2023](https://adventofcode.com/2023/day/7)
 #'
 #' @param x String with hands of cards.
 #'
@@ -266,7 +249,8 @@ split_deck <- function(x) {
   })
 }
 
-#' Split string with cards
+#' Split string with cards, see
+#' [day 7 - 2023](https://adventofcode.com/2023/day/7)
 #'
 #' @param x String with cards.
 #'
@@ -275,20 +259,6 @@ split_deck <- function(x) {
 split_hand <- function(x) {
   strsplit(x, "")[[1]]
 }
-
-#' -   *Five of a kind*, where all five cards have the same label: `AAAAA`
-#' -   *Four of a kind*, where four cards have the same label and one card
-#'     has a different label: `AA8AA`
-#' -   *Full house*, where three cards have the same label, and the
-#'     remaining two cards share a different label: `23332`
-#' -   *Three of a kind*, where three cards have the same label, and the
-#'     remaining two cards are each different from any other card in the
-#'     hand: `TTT98`
-#' -   *Two pair*, where two cards share one label, two other cards share a
-#'     second label, and the remaining card has a third label: `23432`
-#' -   *One pair*, where two cards share one label, and the other three
-#'     cards have a different label from the pair and each other: `A23A4`
-#' -   *High card*, where all cards\' labels are distinct: `23456`
 
 #' @param example Which example data to use (by position or name). Defaults to
 #'   1.

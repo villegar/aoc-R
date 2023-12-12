@@ -17,6 +17,19 @@ load_real_data <- function(day = "00") {
 
 }
 
+#' Reverse a string
+#'
+#' @param x Original string.
+#'
+#' @return Reversed string
+#' @export
+#'
+#' @examples
+#' reverse_string("ouch")
+reverse_string <- function(x) {
+  intToUtf8(rev(utf8ToInt(x)))
+}
+
 #' Wrapper for `lapply` that returns a data frame
 #'
 #' @inheritParams base::lapply
@@ -160,7 +173,31 @@ ind2sub <- function(x, ind) {
 #' @examples
 #' parse_numbers("Distance:  9  40  200", "Distance:")
 parse_numbers <- function(x, header = "") {
-  section <- regmatches(x, regexpr(paste0(header, "[0-9 \n]+"), x))
-  section_2 <- trimws(gsub("\\s+", " ", gsub("\\D", " ", section)))
+  section <- regmatches(x, regexpr(paste0(header, "[0-9 -?\n]+"), x))
+  section_2 <- trimws(gsub("\\s+", " ", gsub(header, "", section)))
   as.numeric(strsplit(section_2, " ")[[1]])
+}
+
+#' Greatest Common Divisor (GCD)
+#'
+#' @param u Numeric value.
+#' @param v Numeric value.
+#'
+#' @return Numeric value with GCD for u and v.
+#' @export
+#'
+#' @source https://rosettacode.org/wiki/Greatest_common_divisor#R
+"%gcd%" <- function(u, v) {
+  ifelse(u %% v != 0, v %gcd% (u%%v), v)
+}
+
+#' Least Common Multiple (LCM)
+#'
+#' @param u Numeric value.
+#' @param v Numeric value.
+#'
+#' @return Numeric value with LCM for u and v.
+#' @export
+lcm <- function(u, v) {
+  abs(u * v) / (u %gcd% v)
 }

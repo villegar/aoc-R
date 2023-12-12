@@ -2,7 +2,8 @@
 % Please edit documentation in R/day07.R
 \name{split_deck}
 \alias{split_deck}
-\title{Split string with hands of cards}
+\title{Split string with hands of cards, see
+\href{https://adventofcode.com/2023/day/7}{day 7 - 2023}}
 \usage{
 split_deck(x)
 }
@@ -13,5 +14,6 @@ split_deck(x)
 Data frame with hands
 }
 \description{
-Split string with hands of cards
+Split string with hands of cards, see
+\href{https://adventofcode.com/2023/day/7}{day 7 - 2023}
 }
