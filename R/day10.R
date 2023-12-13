@@ -157,29 +157,72 @@
 #'   `f10b(x)` returns ....
 #' @export
 #' @examples
-#' f10a(example_data_10())
+#' f10a(example_data_10(2))
 #' f10b()
 f10a <- function(x) {
   field_tiles <- lapply_df(x, \(x) strsplit(x, split = "")[[1]])
   position_mat <- matrix(FALSE, nrow = nrow(field_tiles), ncol = ncol(field_tiles))
-  ref_connections <- valid_connections()
-  start_pos <- ind2sub(field_tiles, )
-  navigate_pipe(x, field_tiles, chr = "S", which(field_tiles == "S"), ref_connections)
+  ref <- valid_connections()
+  start_pos <- ind2sub(field_tiles, which(field_tiles == "S"))
+  loop <- navigate_pipe(field_tiles, position_mat, chr = "S", start_pos, ref)
+  loop
 }
 
 navigate_pipe <- function(x, visited, chr, pos, ref) {
-  aux <- get_adjacent_elements(x, pos$i, pos$j)
-  validate <- ref[, colnames(ref) == chr]
+  if (is.null(chr) | is.na(chr) | length(chr) < 1 | chr == ".")
+    return(data.frame())
+  # extract array with valid connections to current segment
+  valid_conn <- ref[rownames(ref) == chr, ] # ref[, colnames(ref) == chr]
 
-  sapply(matrix(aux, nrow = 1), \(x) validate[which(names(validate) == x)])
-  names(validate) %in% matrix(aux, nrow = 1)
-  apply(, 1, \(x) x == names(validate))
+  # record visited positions
+  x[pos$i, pos$j] <- "."
+  visited[pos$i, pos$j] <- TRUE
+
+  # extract adjacent elements
+  idx_x <- get_indices(pos$i, nrow(x))
+  idx_y <- get_indices(pos$j, ncol(x))
+  aux <- x[idx_x, idx_y]
+  # replace diagonals (if any)
+  aux[!(idx_x %in% pos$i), !(idx_y %in% pos$j)] <- "."
+  # find which adjacent elements are a valid connection, `valid_conn`
+  idx <- sapply(matrix(aux, ncol = 1),
+                \(x) valid_conn[which(names(valid_conn) == x)])
+  # find new indices in reference to original map, x
+  aux_2 <- expand.grid(i = idx_x, j = idx_y)
+  aux_2 <- aux_2[order(aux_2$j, aux_2$i), ]
+  # new_indices <- ind2sub(x, sub2ind(x, aux_2$i, aux_2$j)[idx])
+  new_indices <- aux_2[idx, ]
+  aux_3 <- list()
+  for (i in seq_along(nrow(new_indices))) {
+    tmp <- navigate_pipe(x, visited, chr = x[new_indices$i[i], new_indices$j[i]], new_indices[i, ], ref)
+    aux_3 <- c(tmp)
+  }
+  browser()
+  # aux_3 <- lapply_df(seq_len(nrow(new_indices)), function (i) {
+  #   navigate_pipe(x, visited, chr = x[new_indices$i[i], new_indices$j[i]], new_indices[i, ], ref)
+  # })
+  out <- lapply_df(list(data.frame(i = pos$i, j = pos$j), aux_3),
+                   \(x) x)
+  return(out)
+  # matrix(idx, ncol = ncol(aux), byrow = TRUE)
+  # visited[pos$i, pos$j] <- TRUE
+  # valid_conn <- ref[, colnames(ref) == chr]
+  #
+  # idx <- sapply(matrix(aux, nrow = 1), \(x) valid_conn[which(names(valid_conn) == x)])
+  #
+  # new_indices <- ind2sub(aux, which(idx))
+  # pos
+  #
+  # names(valid_conn) %in% matrix(aux, nrow = 1)
+  # apply(, 1, \(x) x == names(valid_conn))
 }
 
 valid_connections <- function() {
-  mat <- upper.tri(matrix(FALSE, nrow = 8, ncol = 8))
-  mat[1, 1] <- mat[2, 2] <- mat[7, 7] <- mat[8, 8] <- TRUE
-  mat[1, 2] <- mat[, 7] <- mat[7, 8] <- FALSE
+  # mat <- upper.tri(matrix(FALSE, nrow = 8, ncol = 8))
+  # mat[1, 1] <- mat[2, 2] <- mat[7, 7] <- TRUE
+  # mat[1, 2] <- mat[, 7] <- mat[7, 8] <- FALSE
+  mat <- matrix(TRUE, nrow = 8, ncol = 8)
+  mat[1, 2] <- mat[2, 1] <- mat[, 7] <- mat[7, ] <- mat[8, 8] <- FALSE
   colnames(mat) <- c("|", "-", "L", "J", "7", "F", ".", "S")
   rownames(mat) <- c("|", "-", "L", "J", "7", "F", ".", "S")
   return(mat)
@@ -204,6 +247,7 @@ f10_helper <- function(x) {
 example_data_10 <- function(example = 1) {
   l <- list(
     a = c(".....", ".S-7.", ".|.|.", ".L-J.", "....."),
+    a_alt = c("-L|F7", "7S-7|", "L|7||", "-L-J|", "L|-JF"),
     b = c("..F7.", ".FJ|.", "SJ.L7", "|F--J", "LJ...")
   )
   l[[example]]
