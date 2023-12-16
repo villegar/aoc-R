@@ -157,85 +157,204 @@
 #'   `f10b(x)` returns ....
 #' @export
 #' @examples
+#' f10a(example_data_10(1))
 #' f10a(example_data_10(2))
+#' f10a(example_data_10(3))
 #' f10b()
 f10a <- function(x) {
   field_tiles <- lapply_df(x, \(x) strsplit(x, split = "")[[1]])
-  position_mat <- matrix(FALSE, nrow = nrow(field_tiles), ncol = ncol(field_tiles))
-  ref <- valid_connections()
-  start_pos <- ind2sub(field_tiles, which(field_tiles == "S"))
-  loop <- navigate_pipe(field_tiles, position_mat, chr = "S", start_pos, ref)
-  loop
+  navigate_pipe(field_tiles)
 }
 
-navigate_pipe <- function(x, visited, chr, pos, ref) {
-  if (is.null(chr) | is.na(chr) | length(chr) < 1 | chr == ".")
-    return(data.frame())
-  # extract array with valid connections to current segment
-  valid_conn <- ref[rownames(ref) == chr, ] # ref[, colnames(ref) == chr]
+simplify_field <- function(x, k = 1) {
+  out <- list()
+  for (i in seq_len(nrow(x))) {
+    for (j in seq_len(ncol(x))) {
+      chr <- x[i, j]
+      if (chr == ".") {
+        out <- c(out, NA)
+        next
+      }
+      pos <- data.frame(i = i, j = j)
+      out <- c(out,
+               list(validate_connections(x, list(x = x), chr, pos, FALSE, k)))
+    }
+  }
 
-  # record visited positions
-  x[pos$i, pos$j] <- "."
-  visited[pos$i, pos$j] <- TRUE
+  new_x <- matrix(".", nrow = nrow(x), ncol = ncol(x))
+  for (i in seq_along(out)) {
+    if (is.na(out[i]))
+      next
+    aux <- out[i][[1]]
+    if (sum(aux != ".") < 2)
+      next
+    # retrieve element positions
+    idx_x <- as.numeric(rownames(aux))
+    idx_y <- as.numeric(colnames(aux))
+    idx <- new_x[idx_x, idx_y] == "." & aux != "."
+    new_x[idx_x, idx_y][idx] <- aux[idx]
+  }
+  return(new_x)
+}
 
-  # extract adjacent elements
-  idx_x <- get_indices(pos$i, nrow(x))
-  idx_y <- get_indices(pos$j, ncol(x))
-  aux <- x[idx_x, idx_y]
-  # replace diagonals (if any)
-  aux[!(idx_x %in% pos$i), !(idx_y %in% pos$j)] <- "."
-  # find which adjacent elements are a valid connection, `valid_conn`
-  idx <- sapply(matrix(aux, ncol = 1),
-                \(x) valid_conn[which(names(valid_conn) == x)])
+get_next_tiles <- function(env, chr, pos, all = FALSE) {
+  # get tiles for starting position
+  aux <- validate_connections(env$x, env, chr, pos, FALSE)
+  # find which adjacent elements are a valid connection
+  idx <- sapply(matrix(aux, ncol = 1), \(x) x != ".")
   # find new indices in reference to original map, x
+  idx_x <- get_indices(pos$i, nrow(env$x))
+  idx_y <- get_indices(pos$j, ncol(env$x))
   aux_2 <- expand.grid(i = idx_x, j = idx_y)
   aux_2 <- aux_2[order(aux_2$j, aux_2$i), ]
-  # new_indices <- ind2sub(x, sub2ind(x, aux_2$i, aux_2$j)[idx])
   new_indices <- aux_2[idx, ]
-  aux_3 <- list()
-  for (i in seq_along(nrow(new_indices))) {
-    tmp <- navigate_pipe(x, visited, chr = x[new_indices$i[i], new_indices$j[i]], new_indices[i, ], ref)
-    aux_3 <- c(tmp)
-  }
-  browser()
-  # aux_3 <- lapply_df(seq_len(nrow(new_indices)), function (i) {
-  #   navigate_pipe(x, visited, chr = x[new_indices$i[i], new_indices$j[i]], new_indices[i, ], ref)
-  # })
-  out <- lapply_df(list(data.frame(i = pos$i, j = pos$j), aux_3),
-                   \(x) x)
-  return(out)
-  # matrix(idx, ncol = ncol(aux), byrow = TRUE)
-  # visited[pos$i, pos$j] <- TRUE
-  # valid_conn <- ref[, colnames(ref) == chr]
-  #
-  # idx <- sapply(matrix(aux, nrow = 1), \(x) valid_conn[which(names(valid_conn) == x)])
-  #
-  # new_indices <- ind2sub(aux, which(idx))
-  # pos
-  #
-  # names(valid_conn) %in% matrix(aux, nrow = 1)
-  # apply(, 1, \(x) x == names(valid_conn))
+
+  # record visited position
+  env$visited[pos$i, pos$j] <- TRUE
+
+  if (all)
+    return(new_indices)
+
+  # check visited elements
+  idx <- sapply(seq_len(nrow(new_indices)), function (i) {
+    env$visited[new_indices$i[i], new_indices$j[i]]
+  })
+  new_indices[!idx, ]
 }
 
-valid_connections <- function() {
-  # mat <- upper.tri(matrix(FALSE, nrow = 8, ncol = 8))
-  # mat[1, 1] <- mat[2, 2] <- mat[7, 7] <- TRUE
-  # mat[1, 2] <- mat[, 7] <- mat[7, 8] <- FALSE
-  mat <- matrix(TRUE, nrow = 8, ncol = 8)
-  mat[1, 2] <- mat[2, 1] <- mat[, 7] <- mat[7, ] <- mat[8, 8] <- FALSE
-  colnames(mat) <- c("|", "-", "L", "J", "7", "F", ".", "S")
-  rownames(mat) <- c("|", "-", "L", "J", "7", "F", ".", "S")
-  return(mat)
+navigate_pipe <- function(x) {
+  start_pos <- ind2sub(x, which(x == "S"))
+  env <- new.env()
+  assign("visited", matrix(FALSE, nrow = nrow(x), ncol = ncol(x)), env)
+  assign("x", x, env)
+
+  new_indices <- get_next_tiles(env, "S", start_pos)
+  solution_found <- FALSE
+  sub_env <- env
+  for (i in seq_len(nrow(new_indices))) {
+    steps <- 1
+    new_tiles <- get_next_tiles(sub_env,
+                                chr = x[new_indices$i[i], new_indices$j[i]],
+                                pos = new_indices[i, ])
+    if (nrow(new_tiles) < 1)
+      next
+    chr <- x[new_tiles$i[1], new_tiles$j[1]]
+    pos <- new_tiles[1, ]
+    while(TRUE) {
+      steps <- steps + 1
+      if (chr == "S") {
+        solution_found <- TRUE
+        break
+      }
+      aux <- get_next_tiles(sub_env,
+                            chr = chr,
+                            pos = new_tiles[1, ])
+      new_tiles <- new_tiles[-1, ]
+      new_tiles <- do.call(rbind, list(aux, new_tiles))
+      if (nrow(new_tiles) > 0) {
+        chr <- x[new_tiles$i[1], new_tiles$j[1]]
+        pos <- new_tiles[1, ]
+      } else {
+        break
+      }
+    }
+    if (solution_found)
+      break
+    aux <- get_next_tiles(env,
+                          chr = chr,
+                          pos = pos,
+                          all = TRUE)
+    if (any(start_pos$i == aux$i & start_pos$j == aux$j)) {
+      steps <- steps + 1
+      break
+    }
+  }
+
+  return(steps / 2)
+}
+
+validate_connections <- function(x, env, chr, pos, remove_original = TRUE, k = 1) {
+  # extract adjacent elements
+  idx_x <- get_indices(pos$i, nrow(env$x), k = k)
+  idx_y <- get_indices(pos$j, ncol(env$x), k = k)
+  if (remove_original)
+    env$x[pos$i, pos$j] <- "."
+  aux <- env$x[idx_x, idx_y]
+  # replace diagonals (if any)
+  aux[!(idx_x %in% pos$i), !(idx_y %in% pos$j)] <- "."
+  # add column and row names (relative positions)
+  colnames(aux) <- idx_y
+  rownames(aux) <- idx_x
+
+  if (chr == "S")
+    return(aux)
+  if (chr == "|") {
+    # replace connections to the left and right
+    aux[, idx_y != pos$j] <- "."
+    # validate top (|, 7, F)
+    idx <- aux[idx_x < pos$i, ] %in% c("|", "7", "F", "S")
+    aux[idx_x < pos$i, !idx] <- "."
+    # validate bottom (|, L, J)
+    idx <- aux[idx_x > pos$i, ] %in% c("|", "L", "J", "S")
+    aux[idx_x > pos$i, !idx] <- "."
+  } else if (chr == "-") {
+    # replace connections from the top and bottom
+    aux[idx_x != pos$i, ] <- "."
+    # validate left (-, L, F)
+    idx <- aux[, idx_y < pos$j] %in% c("-", "L", "F", "S")
+    aux[!idx, idx_y < pos$j] <- "."
+    # validate right (-, J, 7)
+    idx <- aux[, idx_y > pos$j] %in% c("-", "J", "7", "S")
+    aux[!idx, idx_y > pos$j] <- "."
+  } else if (chr == "F") {
+    # replace connections from the top and left
+    aux[idx_x < pos$i, ] <- "."
+    aux[, idx_y < pos$j] <- "."
+    # validate right (-, J, 7)
+    idx <- aux[, idx_y > pos$j] %in% c("-", "J", "7", "S")
+    aux[!idx, idx_y > pos$j] <- "."
+    # validate bottom (|, L, J)
+    idx <- aux[idx_x > pos$i, ] %in% c("|", "L", "J", "S")
+    aux[idx_x > pos$i, !idx] <- "."
+  } else if (chr == "7") {
+    # replace connections from the top and right
+    aux[idx_x < pos$i, ] <- "."
+    aux[, idx_y > pos$j] <- "."
+    # validate left (-, L, F)
+    idx <- aux[, idx_y < pos$j] %in% c("-", "L", "F", "S")
+    aux[!idx, idx_y < pos$j] <- "."
+    # validate bottom (|, L, J)
+    idx <- aux[idx_x > pos$i, ] %in% c("|", "L", "J", "S")
+    aux[idx_x > pos$i, !idx] <- "."
+  } else if (chr == "J") {
+    # replace connections from the bottom and right
+    aux[idx_x > pos$i, ] <- "."
+    aux[, idx_y > pos$j] <- "."
+    # validate left (-, L, F)
+    idx <- aux[, idx_y < pos$j] %in% c("-", "L", "F", "S")
+    aux[!idx, idx_y < pos$j] <- "."
+    # validate top (|, 7, F)
+    idx <- aux[idx_x < pos$i, ] %in% c("|", "7", "F", "S")
+    aux[idx_x < pos$i, !idx] <- "."
+  } else if (chr == "L") {
+    # replace connections from the bottom and left
+    aux[idx_x > pos$i, ] <- "."
+    aux[, idx_y < pos$j] <- "."
+    # validate right (-, J, 7)
+    idx <- aux[, idx_y > pos$j] %in% c("-", "J", "7", "S")
+    aux[!idx, idx_y > pos$j] <- "."
+    # validate top (|, 7, F)
+    idx <- aux[idx_x < pos$i, ] %in% c("|", "7", "F", "S")
+    aux[idx_x < pos$i, !idx] <- "."
+  } else {
+    aux <- data.frame()
+  }
+  return(aux)
 }
 
 #' @rdname day10
 #' @export
 f10b <- function(x) {
-
-}
-
-
-f10_helper <- function(x) {
 
 }
 
