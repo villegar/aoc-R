@@ -55,6 +55,9 @@
     <loc>https://aocR.robertovillegas-diaz.com/reference/day09.html</loc>
   </url>
   <url>
+    <loc>https://aocR.robertovillegas-diaz.com/reference/day10.html</loc>
+  </url>
+  <url>
     <loc>https://aocR.robertovillegas-diaz.com/reference/day11.html</loc>
   </url>
   <url>
@@ -80,6 +83,9 @@
   </url>
   <url>
     <loc>https://aocR.robertovillegas-diaz.com/reference/get_indices.html</loc>
+  </url>
+  <url>
+    <loc>https://aocR.robertovillegas-diaz.com/reference/get_next_tiles.html</loc>
   </url>
   <url>
     <loc>https://aocR.robertovillegas-diaz.com/reference/grapes-gcd-grapes.html</loc>
@@ -112,6 +118,9 @@
     <loc>https://aocR.robertovillegas-diaz.com/reference/map_schematic_gears.html</loc>
   </url>
   <url>
+    <loc>https://aocR.robertovillegas-diaz.com/reference/navigate_pipe.html</loc>
+  </url>
+  <url>
     <loc>https://aocR.robertovillegas-diaz.com/reference/parse_cubes.html</loc>
   </url>
   <url>
@@ -142,6 +151,9 @@
     <loc>https://aocR.robertovillegas-diaz.com/reference/reverse_string.html</loc>
   </url>
   <url>
+    <loc>https://aocR.robertovillegas-diaz.com/reference/shoelace.html</loc>
+  </url>
+  <url>
     <loc>https://aocR.robertovillegas-diaz.com/reference/split_deck.html</loc>
   </url>
   <url>
@@ -152,6 +164,9 @@
   </url>
   <url>
     <loc>https://aocR.robertovillegas-diaz.com/reference/traverse_map.html</loc>
+  </url>
+  <url>
+    <loc>https://aocR.robertovillegas-diaz.com/reference/validate_connections.html</loc>
   </url>
   <url>
     <loc>https://aocR.robertovillegas-diaz.com/reference/validate_hands.html</loc>
