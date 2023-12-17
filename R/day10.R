@@ -160,12 +160,67 @@
 #' f10a(example_data_10(1))
 #' f10a(example_data_10(2))
 #' f10a(example_data_10(3))
-#' f10b()
+#' f10b(example_data_10(4))
+#' f10b(example_data_10(5))
 f10a <- function(x) {
   field_tiles <- lapply_df(x, \(x) strsplit(x, split = "")[[1]])
-  navigate_pipe(field_tiles)
+  tiles <- navigate_pipe(field_tiles)
+  length(tiles) / 2
 }
 
+#' @rdname day10
+#' @export
+f10b <- function(x) {
+  field_tiles <- lapply_df(x, \(x) strsplit(x, split = "")[[1]])
+  tiles <- navigate_pipe(field_tiles)
+  tiles_df <- lapply_df(tiles, \(x) x)
+  # Use the Shoelace formula to find the area of the polygon given by the
+  # vertices found: https://en.wikipedia.org/wiki/Shoelace_formula
+  total_area <- shoelace(tiles_df$i, tiles_df$j)
+  # use Pick's theorem to calculate the internal area
+  # https://en.wikipedia.org/wiki/Pick%27s_theorem
+  # given that the total area can be calculated with
+  abs(total_area - nrow(tiles_df) / 2 + 1)
+}
+
+shoelace <- function(x, y) {
+  idx_x <- seq_along(x)
+  idx_y <- c(seq_along(y)[-1], 1)
+  sign <- c(1, rep(-1, length(x) - 1))
+  abs(sum(x[idx_x] * y[idx_y] - x[idx_y] * y[idx_x])) / 2
+}
+
+find_enclosed_areas <- function(x, k = 5) {
+  out <- list()
+  for (i in seq_len(nrow(x))) {
+    for (j in seq_len(ncol(x))) {
+      if (x[i, j]) {
+        out <- c(out, NA)
+        next
+      }
+      # extract adjacent elements
+      idx_x <- get_indices(i, nrow(x), k = k)
+      idx_y <- get_indices(j, ncol(x), k = k)
+      aux <- x[idx_x, idx_y]
+      out <- c(out, list(aux))
+    }
+  }
+
+  new_x <- matrix(".", nrow = nrow(x), ncol = ncol(x))
+  for (i in seq_along(out)) {
+    if (is.na(out[i]))
+      next
+    aux <- out[i][[1]]
+    if (sum(aux != ".") < 2)
+      next
+    # retrieve element positions
+    idx_x <- as.numeric(rownames(aux))
+    idx_y <- as.numeric(colnames(aux))
+    idx <- new_x[idx_x, idx_y] == "." & aux != "."
+    new_x[idx_x, idx_y][idx] <- aux[idx]
+  }
+  return(new_x)
+}
 simplify_field <- function(x, k = 1) {
   out <- list()
   for (i in seq_len(nrow(x))) {
@@ -231,8 +286,10 @@ navigate_pipe <- function(x) {
   new_indices <- get_next_tiles(env, "S", start_pos)
   solution_found <- FALSE
   sub_env <- env
+  indices <- list(start_pos)
   for (i in seq_len(nrow(new_indices))) {
     steps <- 1
+    indices <- list(start_pos, new_indices[i, ])
     new_tiles <- get_next_tiles(sub_env,
                                 chr = x[new_indices$i[i], new_indices$j[i]],
                                 pos = new_indices[i, ])
@@ -242,6 +299,7 @@ navigate_pipe <- function(x) {
     pos <- new_tiles[1, ]
     while(TRUE) {
       steps <- steps + 1
+      indices <- c(indices, list(new_tiles[1, ]))
       if (chr == "S") {
         solution_found <- TRUE
         break
@@ -270,7 +328,7 @@ navigate_pipe <- function(x) {
     }
   }
 
-  return(steps / 2)
+  return(indices)
 }
 
 validate_connections <- function(x, env, chr, pos, remove_original = TRUE, k = 1) {
@@ -352,22 +410,38 @@ validate_connections <- function(x, env, chr, pos, remove_original = TRUE, k = 1
   return(aux)
 }
 
-#' @rdname day10
-#' @export
-f10b <- function(x) {
-
-}
-
-
 #' @param example Which example data to use (by position or name). Defaults to
 #'   1.
 #' @rdname day10
 #' @export
 example_data_10 <- function(example = 1) {
   l <- list(
-    a = c(".....", ".S-7.", ".|.|.", ".L-J.", "....."),
-    a_alt = c("-L|F7", "7S-7|", "L|7||", "-L-J|", "L|-JF"),
-    b = c("..F7.", ".FJ|.", "SJ.L7", "|F--J", "LJ...")
+    a1 = c(".....", ".S-7.", ".|.|.", ".L-J.", "....."),
+    a2 = c("-L|F7", "7S-7|", "L|7||", "-L-J|", "L|-JF"),
+    a3 = c("..F7.", ".FJ|.", "SJ.L7", "|F--J", "LJ..."),
+    b1 = c(
+      "...........",
+      ".S-------7.",
+      ".|F-----7|.",
+      ".||.....||.",
+      ".||.....||.",
+      ".|L-7.F-J|.",
+      ".|..|.|..|.",
+      ".L--J.L--J.",
+      "..........."
+    ),
+    b2 = c(
+      ".F----7F7F7F7F-7....",
+      ".|F--7||||||||FJ....",
+      ".||.FJ||||||||L7....",
+      "FJL7L7LJLJ||LJ.L-7..",
+      "L--J.L7...LJS7F-7L7.",
+      "....F-J..F7FJ|L7L7L7",
+      "....L7.F7||L7|.L7L7|",
+      ".....|FJLJ|FJ|F7|.LJ",
+      "....FJL-7.||.||||...",
+      "....L---J.LJ.LJLJ..."
+    )
   )
   l[[example]]
 }
