@@ -201,3 +201,22 @@ parse_numbers <- function(x, header = "") {
 lcm <- function(u, v) {
   abs(u * v) / (u %gcd% v)
 }
+
+#' Shoelace formula
+#'
+#' Shoelace formula to find the area of the polygon given by the
+#' vertices found: https://en.wikipedia.org/wiki/Shoelace_formula
+#'
+#' @param x Numeric vector.
+#' @param y Numeric vector.
+#'
+#' @return Area of polygon enclosed by the given points (`x`, `y`).
+#' @export
+#'
+#' @examples
+#' shoelace(x = c(1, 1, 4, 4, 8), y = c(1, 4, 1, 4, 2))
+shoelace <- function(x, y) {
+  idx_x <- seq_along(x)
+  idx_y <- c(seq_along(y)[-1], 1)
+  abs(sum(x[idx_x] * y[idx_y] - x[idx_y] * y[idx_x])) / 2
+}
