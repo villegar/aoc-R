@@ -183,79 +183,21 @@ f10b <- function(x) {
   abs(total_area - nrow(tiles_df) / 2 + 1)
 }
 
-shoelace <- function(x, y) {
-  idx_x <- seq_along(x)
-  idx_y <- c(seq_along(y)[-1], 1)
-  sign <- c(1, rep(-1, length(x) - 1))
-  abs(sum(x[idx_x] * y[idx_y] - x[idx_y] * y[idx_x])) / 2
-}
-
-find_enclosed_areas <- function(x, k = 5) {
-  out <- list()
-  for (i in seq_len(nrow(x))) {
-    for (j in seq_len(ncol(x))) {
-      if (x[i, j]) {
-        out <- c(out, NA)
-        next
-      }
-      # extract adjacent elements
-      idx_x <- get_indices(i, nrow(x), k = k)
-      idx_y <- get_indices(j, ncol(x), k = k)
-      aux <- x[idx_x, idx_y]
-      out <- c(out, list(aux))
-    }
-  }
-
-  new_x <- matrix(".", nrow = nrow(x), ncol = ncol(x))
-  for (i in seq_along(out)) {
-    if (is.na(out[i]))
-      next
-    aux <- out[i][[1]]
-    if (sum(aux != ".") < 2)
-      next
-    # retrieve element positions
-    idx_x <- as.numeric(rownames(aux))
-    idx_y <- as.numeric(colnames(aux))
-    idx <- new_x[idx_x, idx_y] == "." & aux != "."
-    new_x[idx_x, idx_y][idx] <- aux[idx]
-  }
-  return(new_x)
-}
-simplify_field <- function(x, k = 1) {
-  out <- list()
-  for (i in seq_len(nrow(x))) {
-    for (j in seq_len(ncol(x))) {
-      chr <- x[i, j]
-      if (chr == ".") {
-        out <- c(out, NA)
-        next
-      }
-      pos <- data.frame(i = i, j = j)
-      out <- c(out,
-               list(validate_connections(x, list(x = x), chr, pos, FALSE, k)))
-    }
-  }
-
-  new_x <- matrix(".", nrow = nrow(x), ncol = ncol(x))
-  for (i in seq_along(out)) {
-    if (is.na(out[i]))
-      next
-    aux <- out[i][[1]]
-    if (sum(aux != ".") < 2)
-      next
-    # retrieve element positions
-    idx_x <- as.numeric(rownames(aux))
-    idx_y <- as.numeric(colnames(aux))
-    idx <- new_x[idx_x, idx_y] == "." & aux != "."
-    new_x[idx_x, idx_y][idx] <- aux[idx]
-  }
-  return(new_x)
-}
-
+#' Get next field tiles, see
+#' [day 10 - 2023](https://adventofcode.com/2023/day/10)
+#'
+#' @param env Environment with the current field, `x`.
+#' @param chr Character with current position's element.
+#' @param pos Data frame with current position (`i`, `j`).
+#' @param all Boolean flag to indicate if all tiles (including visited)
+#'     should be returned.
+#'
+#' @return Data frame with next tile positions.
+#' @export
 get_next_tiles <- function(env, chr, pos, all = FALSE) {
-  # get tiles for starting position
-  aux <- validate_connections(env$x, env, chr, pos, FALSE)
-  # find which adjacent elements are a valid connection
+  # get tiles for near the current position, `pos`
+  aux <- validate_connections(env, chr, pos, FALSE)
+  # find which adjacent elements are NOT  ground
   idx <- sapply(matrix(aux, ncol = 1), \(x) x != ".")
   # find new indices in reference to original map, x
   idx_x <- get_indices(pos$i, nrow(env$x))
@@ -277,30 +219,44 @@ get_next_tiles <- function(env, chr, pos, all = FALSE) {
   new_indices[!idx, ]
 }
 
+#' Navigate field of pipes, see
+#' [day 10 - 2023](https://adventofcode.com/2023/day/10)
+#'
+#' @param x Matrix with field of pipes.
+#'
+#' @return List with visited pipes to form a loop from the starting point.
+#' @export
 navigate_pipe <- function(x) {
+  # find starting point, `S`
   start_pos <- ind2sub(x, which(x == "S"))
+
+  # create new environment with a matrix of visited locations and field of pipes
   env <- new.env()
   assign("visited", matrix(FALSE, nrow = nrow(x), ncol = ncol(x)), env)
   assign("x", x, env)
 
+  # retrieve positions connected to the starting point (up, left, down, right)
   new_indices <- get_next_tiles(env, "S", start_pos)
   solution_found <- FALSE
   sub_env <- env
-  indices <- list(start_pos)
+  indices <- list(start_pos) # list of visited points
+  # loop through the list of points connected to the starting point
   for (i in seq_len(nrow(new_indices))) {
-    steps <- 1
-    indices <- list(start_pos, new_indices[i, ])
+    steps <- 1 # step counter
+    indices <- list(start_pos, new_indices[i, ]) # record indices visited
+    # get next tiles from the current position
     new_tiles <- get_next_tiles(sub_env,
                                 chr = x[new_indices$i[i], new_indices$j[i]],
                                 pos = new_indices[i, ])
-    if (nrow(new_tiles) < 1)
+    if (nrow(new_tiles) < 1) # are there any new tiles?
       next
     chr <- x[new_tiles$i[1], new_tiles$j[1]]
     pos <- new_tiles[1, ]
+    # keep navigating the field until no more connections are found
     while(TRUE) {
       steps <- steps + 1
       indices <- c(indices, list(new_tiles[1, ]))
-      if (chr == "S") {
+      if (chr == "S") { # check if the current position is the starting point
         solution_found <- TRUE
         break
       }
@@ -318,6 +274,7 @@ navigate_pipe <- function(x) {
     }
     if (solution_found)
       break
+    # check if the starting position can be reach by moving one position
     aux <- get_next_tiles(env,
                           chr = chr,
                           pos = pos,
@@ -331,7 +288,19 @@ navigate_pipe <- function(x) {
   return(indices)
 }
 
-validate_connections <- function(x, env, chr, pos, remove_original = TRUE, k = 1) {
+#' Validate pipe connections, see
+#' [day 10 - 2023](https://adventofcode.com/2023/day/10)
+#'
+#' @param env Environment with the current field, `x`.
+#' @param chr Character with current position's element.
+#' @param pos Data frame with current position (`i`, `j`).
+#' @param remove_original Boolean flag to indicate if the current tile should be
+#'     removed from the original field (i.e., changed to ".").
+#' @param k Integer with the number of `k` nearest neighbours to return.
+#'
+#' @return Matrix with validated connections for the current tile.
+#' @export
+validate_connections <- function(env, chr, pos, remove_original = TRUE, k = 1) {
   # extract adjacent elements
   idx_x <- get_indices(pos$i, nrow(env$x), k = k)
   idx_y <- get_indices(pos$j, ncol(env$x), k = k)
