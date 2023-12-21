@@ -130,6 +130,13 @@ f13b <- function(x) {
   sum(mid_points$score, na.rm = TRUE)
 }
 
+#' Parse patterns, see
+#' [day 13 - 2023](https://adventofcode.com/2023/day/13)
+#'
+#' @param x String with patterns.
+#'
+#' @return List with 2D matrices for each pattern.
+#' @export
 parse_patterns <- function(x) {
   new_pattern <- list()
   last_index <- 1
@@ -144,6 +151,14 @@ parse_patterns <- function(x) {
   lapply(new_pattern, \(x) lapply_df(x, \(y) strsplit(y, "")[[1]]))
 }
 
+#' Find mid point for the reflection, see
+#' [day 13 - 2023](https://adventofcode.com/2023/day/13)
+#'
+#' @param x Matrix with pattern.
+#' @param diff_count Number of differences allowed.
+#'
+#' @return Data frame with score for each pattern.
+#' @export
 find_mid_point_reflection <- function(x, diff_count = 0) {
   # vertical
   idx_x <- seq_len(ncol(x) - 1)
@@ -184,7 +199,7 @@ find_mid_point_reflection <- function(x, diff_count = 0) {
       break
     }
   }
-  return(data.frame(score = col + row * 100))
+  return(data.frame(col = col, row = row, score = col + row * 100))
 }
 
 #' @param example Which example data to use (by position or name). Defaults to
