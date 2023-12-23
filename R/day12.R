@@ -146,19 +146,22 @@
 #' @export
 #' @examples
 #' f12a(example_data_12(2))
-#' f12b()
+#' f12b(example_data_12(2))
 f12a <- function(x) {
   parsed_records <- parse_condition_records(x)
   combinations <- lapply_df(apply(parsed_records, 1, check_records), \(x) x)
   sum(combinations, na.rm = TRUE)
 }
 
-parse_condition_records <- function(x) {
+parse_condition_records <- function(x, times = 1) {
   lapply_df(seq_along(x), function(i) {
     tmp <- strsplit(x[[i]], "\\s")[[1]]
     format_1 <- strsplit(tmp[1], "")[[1]]
     format_2 <- as.numeric(strsplit(tmp[2], ",")[[1]])
-    list(id = i, f1 = format_1, f2 = format_2)
+    list(id = i,
+         f1 = rep(format_1, times),
+         f2 = rep(format_2, times)
+    )
   })
 }
 
@@ -194,7 +197,10 @@ check_records <- function(x) {
 #' @rdname day12
 #' @export
 f12b <- function(x) {
-
+  x <- example_data_12(2)
+  parsed_records <- parse_condition_records(x, times = 5)
+  combinations <- lapply_df(apply(parsed_records, 1, check_records), \(x) x)
+  sum(combinations, na.rm = TRUE)
 }
 
 
