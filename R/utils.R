@@ -220,3 +220,46 @@ shoelace <- function(x, y) {
   idx_y <- c(seq_along(y)[-1], 1)
   abs(sum(x[idx_x] * y[idx_y] - x[idx_y] * y[idx_x])) / 2
 }
+
+#' Reverse string
+#'
+#' @param x String to be reversed.
+#'
+#' @return Reversed string.
+#' @export
+#'
+#' @examples
+#' rev_str("abc")
+rev_str <- function(x) {
+  intToUtf8(rev(utf8ToInt(x)))
+}
+
+#' Rotate 2D array 90 deg clockwise
+#'
+#' @param x Input array.
+#'
+#' @return Rotated array
+#' @export
+rotate <- function(x) {
+  t(apply(x, 2, rev))
+}
+
+#' Rotate 2D array 90 deg anti-clockwise
+#'
+#' @param x Input array.
+#'
+#' @return Rotated array
+#' @export
+rotate_rev <- function(x) {
+  apply(t(x), 2, rev)
+}
+
+#' Get hashing key from matrix elements
+#'
+#' @param x Matrix.
+#'
+#' @return String with hashing key for matrix.
+#' @export
+get_key <- function(x) {
+  paste0(as.character(matrix(x, nrow = 1)), collapse = "")
+}
