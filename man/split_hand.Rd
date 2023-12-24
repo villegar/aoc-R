@@ -2,7 +2,8 @@
 % Please edit documentation in R/day07.R
 \name{split_hand}
 \alias{split_hand}
-\title{Split string with cards}
+\title{Split string with cards, see
+\href{https://adventofcode.com/2023/day/7}{day 7 - 2023}}
 \usage{
 split_hand(x)
 }
@@ -13,5 +14,6 @@ split_hand(x)
 Vector of strings for each card
 }
 \description{
-Split string with cards
+Split string with cards, see
+\href{https://adventofcode.com/2023/day/7}{day 7 - 2023}
 }

@@ -17,6 +17,19 @@ load_real_data <- function(day = "00") {
 
 }
 
+#' Reverse a string
+#'
+#' @param x Original string.
+#'
+#' @return Reversed string
+#' @export
+#'
+#' @examples
+#' reverse_string("ouch")
+reverse_string <- function(x) {
+  intToUtf8(rev(utf8ToInt(x)))
+}
+
 #' Wrapper for `lapply` that returns a data frame
 #'
 #' @inheritParams base::lapply
@@ -160,9 +173,52 @@ ind2sub <- function(x, ind) {
 #' @examples
 #' parse_numbers("Distance:  9  40  200", "Distance:")
 parse_numbers <- function(x, header = "") {
-  section <- regmatches(x, regexpr(paste0(header, "[0-9 \n]+"), x))
-  section_2 <- trimws(gsub("\\s+", " ", gsub("\\D", " ", section)))
+  section <- regmatches(x, regexpr(paste0(header, "[0-9 -?\n]+"), x))
+  section_2 <- trimws(gsub("\\s+", " ", gsub(header, "", section)))
   as.numeric(strsplit(section_2, " ")[[1]])
+}
+
+#' Greatest Common Divisor (GCD)
+#'
+#' @param u Numeric value.
+#' @param v Numeric value.
+#'
+#' @return Numeric value with GCD for u and v.
+#' @export
+#'
+#' @source https://rosettacode.org/wiki/Greatest_common_divisor#R
+"%gcd%" <- function(u, v) {
+  ifelse(u %% v != 0, v %gcd% (u%%v), v)
+}
+
+#' Least Common Multiple (LCM)
+#'
+#' @param u Numeric value.
+#' @param v Numeric value.
+#'
+#' @return Numeric value with LCM for u and v.
+#' @export
+lcm <- function(u, v) {
+  abs(u * v) / (u %gcd% v)
+}
+
+#' Shoelace formula
+#'
+#' Shoelace formula to find the area of the polygon given by the
+#' vertices found: https://en.wikipedia.org/wiki/Shoelace_formula
+#'
+#' @param x Numeric vector.
+#' @param y Numeric vector.
+#'
+#' @return Area of polygon enclosed by the given points (`x`, `y`).
+#' @export
+#'
+#' @examples
+#' shoelace(x = c(1, 1, 4, 4, 8), y = c(1, 4, 1, 4, 2))
+shoelace <- function(x, y) {
+  idx_x <- seq_along(x)
+  idx_y <- c(seq_along(y)[-1], 1)
+  abs(sum(x[idx_x] * y[idx_y] - x[idx_y] * y[idx_x])) / 2
 }
 
 #' Reverse string
@@ -198,7 +254,6 @@ rotate_rev <- function(x) {
   apply(t(x), 2, rev)
 }
 
-
 #' Get hashing key from matrix elements
 #'
 #' @param x Matrix.
@@ -208,4 +263,3 @@ rotate_rev <- function(x) {
 get_key <- function(x) {
   paste0(as.character(matrix(x, nrow = 1)), collapse = "")
 }
-

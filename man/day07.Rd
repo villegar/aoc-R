@@ -7,14 +7,16 @@
 \alias{example_data_07}
 \title{Day 07: Camel Cards}
 \usage{
-f07a(x)
+f07a(x, joker = FALSE)
 
 f07b(x)
 
 example_data_07(example = 1)
 }
 \arguments{
-\item{x}{some data}
+\item{x}{some data.}
+
+\item{joker}{Flag to indicate if jokers ('J') are scored differently.}
 
 \item{example}{Which example data to use (by position or name). Defaults to
 1.}
