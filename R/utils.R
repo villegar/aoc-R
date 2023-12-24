@@ -164,3 +164,37 @@ parse_numbers <- function(x, header = "") {
   section_2 <- trimws(gsub("\\s+", " ", gsub("\\D", " ", section)))
   as.numeric(strsplit(section_2, " ")[[1]])
 }
+
+#' Reverse string
+#'
+#' @param x String to be reversed.
+#'
+#' @return Reversed string.
+#' @export
+#'
+#' @examples
+#' rev_str("abc")
+rev_str <- function(x) {
+  intToUtf8(rev(utf8ToInt(x)))
+}
+
+#' Rotate 2D array 90 deg clockwise
+#'
+#' @param x Input array.
+#'
+#' @return Rotated array
+#' @export
+rotate <- function(x) {
+  t(apply(x, 2, rev))
+}
+
+#' Rotate 2D array 90 deg anti-clockwise
+#'
+#' @param x Input array.
+#'
+#' @return Rotated array
+#' @export
+rotate_rev <- function(x) {
+  apply(t(x), 2, rev)
+}
+
