@@ -61,10 +61,19 @@
     <loc>https://aocR.robertovillegas-diaz.com/reference/day11.html</loc>
   </url>
   <url>
+    <loc>https://aocR.robertovillegas-diaz.com/reference/day13.html</loc>
+  </url>
+  <url>
+    <loc>https://aocR.robertovillegas-diaz.com/reference/day14.html</loc>
+  </url>
+  <url>
     <loc>https://aocR.robertovillegas-diaz.com/reference/extrapolate_values.html</loc>
   </url>
   <url>
     <loc>https://aocR.robertovillegas-diaz.com/reference/f01_helper.html</loc>
+  </url>
+  <url>
+    <loc>https://aocR.robertovillegas-diaz.com/reference/find_mid_point_reflection.html</loc>
   </url>
   <url>
     <loc>https://aocR.robertovillegas-diaz.com/reference/find_min_location.html</loc>
@@ -83,6 +92,9 @@
   </url>
   <url>
     <loc>https://aocR.robertovillegas-diaz.com/reference/get_indices.html</loc>
+  </url>
+  <url>
+    <loc>https://aocR.robertovillegas-diaz.com/reference/get_key.html</loc>
   </url>
   <url>
     <loc>https://aocR.robertovillegas-diaz.com/reference/get_next_tiles.html</loc>
@@ -136,6 +148,9 @@
     <loc>https://aocR.robertovillegas-diaz.com/reference/parse_numbers.html</loc>
   </url>
   <url>
+    <loc>https://aocR.robertovillegas-diaz.com/reference/parse_patterns.html</loc>
+  </url>
+  <url>
     <loc>https://aocR.robertovillegas-diaz.com/reference/parse_schematic.html</loc>
   </url>
   <url>
@@ -148,7 +163,16 @@
     <loc>https://aocR.robertovillegas-diaz.com/reference/replace_chrs.html</loc>
   </url>
   <url>
+    <loc>https://aocR.robertovillegas-diaz.com/reference/rev_str.html</loc>
+  </url>
+  <url>
     <loc>https://aocR.robertovillegas-diaz.com/reference/reverse_string.html</loc>
+  </url>
+  <url>
+    <loc>https://aocR.robertovillegas-diaz.com/reference/rotate.html</loc>
+  </url>
+  <url>
+    <loc>https://aocR.robertovillegas-diaz.com/reference/rotate_rev.html</loc>
   </url>
   <url>
     <loc>https://aocR.robertovillegas-diaz.com/reference/shoelace.html</loc>
@@ -161,6 +185,15 @@
   </url>
   <url>
     <loc>https://aocR.robertovillegas-diaz.com/reference/sub2ind.html</loc>
+  </url>
+  <url>
+    <loc>https://aocR.robertovillegas-diaz.com/reference/tilt_cycle.html</loc>
+  </url>
+  <url>
+    <loc>https://aocR.robertovillegas-diaz.com/reference/tilt_platform.html</loc>
+  </url>
+  <url>
+    <loc>https://aocR.robertovillegas-diaz.com/reference/total_load.html</loc>
   </url>
   <url>
     <loc>https://aocR.robertovillegas-diaz.com/reference/traverse_map.html</loc>
