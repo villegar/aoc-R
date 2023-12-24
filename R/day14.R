@@ -102,20 +102,34 @@
 #' @export
 #' @examples
 #' f14a(example_data_14(1))
-#' f14b()
+#' f14b(example_data_14(1))
 f14a <- function(x) {
   parsed_platform <- lapply_df(x, \(x) strsplit(x, "")[[1]])
   tilted_platform <- tilt_platform(parsed_platform)
   total_load(tilted_platform)
 }
 
+#' Tilt platform, see
+#' [day 14 - 2023](https://adventofcode.com/2023/day/14)
+#'
+#'
+#' @param x Parsed platform, matrix.
+#' @param direction Integer with tilting direction: 1 (North), 2 (West),
+#'     3 (South) and 4 (East).
+#'
+#' @return Tilted platform, matrix.
+#' @export
 tilt_platform <- function(x, direction = 1) {
   if (direction %in% c(1, 3)) { # North and South
     # extract columns from the platform
     x_vecs <- apply(x, 2, \(x) paste0(x, collapse = ""))
+    if (direction == 3)
+      x_vecs <- sapply(x_vecs, rev_str)
   } else { # East and West
-    # extract columns from the platform
+    # extract rows from the platform
     x_vecs <- apply(x, 1, \(x) paste0(x, collapse = ""))
+    if (direction == 4)
+      x_vecs <- sapply(x_vecs, rev_str)
   }
   # tilt platform
   x_tilted <- sapply(x_vecs, function(str) {
@@ -133,12 +147,23 @@ tilt_platform <- function(x, direction = 1) {
     paste0(str_3, collapse = "")
   })
   # break platform into tiles
-  if (direction %in% c(1:2)) # North and West
+  if (direction == 1) # North
     return(t(lapply_df(x_tilted, \(x) strsplit(x, "")[[1]])))
-  # East and South
-  return(t(lapply_df(sapply(x_tilted, rev_str), \(x) strsplit(x, "")[[1]])))
+  if (direction == 2) # West
+    return(lapply_df(x_tilted, \(x) strsplit(x, "")[[1]]))
+  if (direction == 3) # South
+    return(t(lapply_df(sapply(x_tilted, rev_str), \(x) strsplit(x, "")[[1]])))
+  if (direction == 4) # East
+  return(lapply_df(sapply(x_tilted, rev_str), \(x) strsplit(x, "")[[1]]))
 }
 
+#' Calculate total load, see
+#' [day 14 - 2023](https://adventofcode.com/2023/day/14)
+#'
+#' @param x Tilted platform, matrix.
+#'
+#' @return Total load.
+#' @export
 total_load <- function(x) {
   rounded_rocks <- apply(x, 1, \(x) sum(x == "O"))
   sum(rev(seq_len(nrow(x))) * rounded_rocks)
@@ -147,15 +172,45 @@ total_load <- function(x) {
 #' @rdname day14
 #' @export
 f14b <- function(x) {
+  cycles <- 1E3
   parsed_platform <- lapply_df(x, \(x) strsplit(x, "")[[1]])
-  tilted_platform <- tilt_platform(parsed_platform)
-  tilted_platform <- tilt_platform(tilted_platform, 2)
-  tilted_platform <- tilt_platform(tilted_platform, 3)
-  tilted_platform <- tilt_platform(tilted_platform, 4)
+  tilted_platform <- parsed_platform
+  # hsh_tb <- hashtab()
+  # sethash(hsh_tb, get_key(tilted_platform), 0)
+  for (i in seq_len(cycles)) {
+    tilted_platform <- tilt_cycle(tilted_platform)
+    # new_key <- get_key(tilted_platform)
+    # existing_hash <- gethash(hsh_tb, new_key, NULL)
+    # sethash(hsh_tb, new_key, i)
+    # if (!is.null(existing_hash)) {
+    #   message("Hash found: ", i)
+    #   print(existing_hash)
+    #   print(new_key)
+    #   break
+    # }
+  }
   total_load(tilted_platform)
 }
 
-
+#' Tilting cycle, see
+#' [day 14 - 2023](https://adventofcode.com/2023/day/14)
+#'
+#' @param x Parsed platform, matrix.
+#'
+#' @return Tilted platform, matrix.
+#' @export
+tilt_cycle <- function(x) {
+  tilt_platform(
+    tilt_platform(
+      tilt_platform(
+        tilt_platform(x, direction = 1), # North
+        direction = 2 # West
+      ),
+      direction = 3 # South
+    ),
+    direction = 4 # East
+  )
+}
 
 #' @param example Which example data to use (by position or name). Defaults to
 #'   1.
