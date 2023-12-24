@@ -198,3 +198,14 @@ rotate_rev <- function(x) {
   apply(t(x), 2, rev)
 }
 
+
+#' Get hashing key from matrix elements
+#'
+#' @param x Matrix.
+#'
+#' @return String with hashing key for matrix.
+#' @export
+get_key <- function(x) {
+  paste0(as.character(matrix(x, nrow = 1)), collapse = "")
+}
+
