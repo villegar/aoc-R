@@ -16,9 +16,9 @@ This repo is based on a template created by Matt Dray, [aoc.rstats.template](htt
 
 ## Daily meme
 
-![](https://i.redd.it/y4hq04l3ca6c1.png)
+![](https://i.redd.it/l1epr1r1mf6c1.jpeg)
 
-**Source**: [https://www.reddit.com/r/adventofcode/comments/18ic3v7](https://www.reddit.com/r/adventofcode/comments/18ic3v7/2023_day_14_part_2_unorthodox_brute_force/)
+**Source**: [https://www.reddit.com/r/adventofcode/comments/18iwpa4](https://www.reddit.com/r/adventofcode/comments/18iwpa4/2023_day_15_part_2_statement/)
 
 #### Log
 - Day 3: [image](https://i.redd.it/etb8fgoot14c1.jpg) | [source](https://www.reddit.com/r/adventofcode/comments/189q1d2/difficulty_is_all_over_the_place_isnt_it/)
@@ -26,3 +26,4 @@ This repo is based on a template created by Matt Dray, [aoc.rstats.template](htt
 - Day 7: [image](https://i.redd.it/lu6qbfblgt4c1.jpg) | [source](https://www.reddit.com/r/adventofcode/comments/18cpf4z/2023_day_7_theres_always_day_8/)
 - Day 9: [image](https://i.redd.it/7yid0wjvx05c1.png) | [source](https://www.reddit.com/r/adventofcode/comments/18dhnkt/2023_day_8_part_2_spoiler_when_you_get_too/)
 - Day 13: [image](https://i.redd.it/0ngh1154m46c1.png) | [source](https://www.reddit.com/r/adventofcode/comments/18hr1en/2023_day_13_part_1_not_understanding_symmetry_for/)
+- Day 14: [image](https://i.redd.it/y4hq04l3ca6c1.png) | [source](https://www.reddit.com/r/adventofcode/comments/18ic3v7/2023_day_14_part_2_unorthodox_brute_force/)
