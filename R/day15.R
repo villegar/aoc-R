@@ -13,11 +13,11 @@
 #' largest mountain on Lava Island. As you approach the mountain, you find
 #' that the light is being collected by the wall of a large facility
 #' embedded in the mountainside.
-#' 
+#'
 #' You find a door under a large sign that says \"Lava Production
 #' Facility\" and next to a smaller sign that says \"Danger - Personal
 #' Protective Equipment required beyond this point\".
-#' 
+#'
 #' As you step inside, you are immediately greeted by a somewhat panicked
 #' [reindeer]{title="do you like my hard hat"} wearing goggles and a
 #' loose-fitting [hard
@@ -26,28 +26,28 @@
 #' some that fit) and then further into the facility. At one point, you
 #' pass a button with a faint snout mark and the label \"PUSH FOR HELP\".
 #' No wonder you were loaded into that [trebuchet](1) so quickly!
-#' 
+#'
 #' You pass through a final set of doors surrounded with even more warning
 #' signs and into what must be the room that collects all of the light from
 #' outside. As you admire the large assortment of lenses available to
 #' further focus the light, the reindeer brings you a book titled
 #' \"Initialization Manual\".
-#' 
+#'
 #' \"Hello!\", the book cheerfully begins, apparently unaware of the
 #' concerned reindeer reading over your shoulder. \"This procedure will let
 #' you bring the Lava Production Facility online - all without burning or
 #' melting anything unintended!\"
-#' 
+#'
 #' \"Before you begin, please be prepared to use the Holiday ASCII String
 #' Helper algorithm (appendix 1A).\" You turn to appendix 1A. The reindeer
 #' leans closer with interest.
-#' 
+#'
 #' The HASH algorithm is a way to turn any
 #' [string](https://en.wikipedia.org/wiki/String_(computer_science)){target="_blank"}
 #' of characters into a single *number* in the range 0 to 255. To run the
 #' HASH algorithm on a string, start with a *current value* of `0`. Then,
 #' for each character in the string starting from the beginning:
-#' 
+#'
 #' -   Determine the [ASCII
 #'     code](https://en.wikipedia.org/wiki/ASCII#Printable_characters){target="_blank"}
 #'     for the current character of the string.
@@ -56,13 +56,13 @@
 #' -   Set the *current value* to the
 #'     [remainder](https://en.wikipedia.org/wiki/Modulo){target="_blank"}
 #'     of dividing itself by `256`.
-#' 
+#'
 #' After following these steps for each character in the string in order,
 #' the *current value* is the output of the HASH algorithm.
-#' 
+#'
 #' So, to find the result of running the HASH algorithm on the string
 #' `HASH`:
-#' 
+#'
 #' -   The *current value* starts at `0`.
 #' -   The first character is `H`; its ASCII code is `72`.
 #' -   The *current value* increases to `72`.
@@ -84,23 +84,23 @@
 #' -   The *current value* is multiplied by `17` to become `4148`.
 #' -   The *current value* becomes *`52`* (the remainder of `4148` divided
 #'     by `256`).
-#' 
+#'
 #' So, the result of running the HASH algorithm on the string `HASH` is
 #' *`52`*.
-#' 
+#'
 #' The *initialization sequence* (your puzzle input) is a comma-separated
 #' list of steps to start the Lava Production Facility. *Ignore newline
 #' characters* when parsing the initialization sequence. To verify that
 #' your HASH algorithm is working, the book offers the sum of the result of
 #' running the HASH algorithm on each step in the initialization sequence.
-#' 
+#'
 #' For example:
-#' 
+#'
 #'     rn=1,cm-,qp=3,cm=2,qp-,pc=4,ot=9,ab=5,pc-,pc=6,ot=7
-#' 
+#'
 #' This initialization sequence specifies 11 individual steps; the result
 #' of running the HASH algorithm on each of the steps is as follows:
-#' 
+#'
 #' -   `rn=1` becomes *`30`*.
 #' -   `cm-` becomes *`253`*.
 #' -   `qp=3` becomes *`97`*.
@@ -112,11 +112,11 @@
 #' -   `pc-` becomes *`48`*.
 #' -   `pc=6` becomes *`214`*.
 #' -   `ot=7` becomes *`231`*.
-#' 
+#'
 #' In this example, the sum of these results is *`1320`*. Unfortunately,
 #' the reindeer has stolen the page containing the expected verification
 #' number and is currently running around the facility with it excitedly.
-#' 
+#'
 #' Run the HASH algorithm on each step in the initialization sequence.
 #' *What is the sum of the results?* (The initialization sequence is one
 #' long line; be careful when copy-pasting it.)
@@ -135,9 +135,21 @@
 #' f15a(example_data_15())
 #' f15b()
 f15a <- function(x) {
-
+  parsed_sequence <- sapply(strsplit(x, ",")[[1]],
+                            \(x) strsplit(x, "")[[1]])
+  sum(sapply(parsed_sequence, get_mapping), na.rm = TRUE)
 }
 
+get_hash <- function(x, offset = 0, max = 256, mult = 17) {
+  ((utf8ToInt(x) + offset) * mult) %% max
+}
+
+get_mapping <- function(x, offset = 0, max = 256, mult = 17) {
+  for (i in seq_along(x)) {
+    offset <- get_hash(x[i], offset, max, mult)
+  }
+  return(offset)
+}
 
 #' @rdname day15
 #' @export
@@ -145,22 +157,13 @@ f15b <- function(x) {
 
 }
 
-
-f15_helper <- function(x) {
-
-}
-
-
 #' @param example Which example data to use (by position or name). Defaults to
 #'   1.
 #' @rdname day15
 #' @export
 example_data_15 <- function(example = 1) {
   l <- list(
-    a = c(
-
-
-    )
+    a = c("rn=1,cm-,qp=3,cm=2,qp-,pc=4,ot=9,ab=5,pc-,pc=6,ot=7")
   )
   l[[example]]
 }
