@@ -263,3 +263,17 @@ rotate_rev <- function(x) {
 get_key <- function(x) {
   paste0(as.character(matrix(x, nrow = 1)), collapse = "")
 }
+
+#' Get all hashkeys of a hash table
+#'
+#' @param h Hashtable, created with `utils::hashtab`.
+#'
+#' @return List of keys.
+#' @export
+hashkeys <- function(h) {
+  val <- vector("list", numhash(h))
+  idx <- 0
+  utils::maphash(h, function(k, v) { idx <<- idx + 1
+  val[idx] <<- list(k) })
+  sapply(val, \(x) x)
+}
