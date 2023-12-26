@@ -140,10 +140,31 @@ f15a <- function(x) {
   sum(sapply(parsed_sequence, get_mapping), na.rm = TRUE)
 }
 
+#' Get hash, see
+#' [day 15 - 2023](https://adventofcode.com/2023/day/15)
+#'
+#'
+#' @param x String to be hashed.
+#' @param offset Integer with hashing offset.
+#' @param max Maximum number of elements in hashing table.
+#' @param mult Integer with scaling factor.
+#'
+#' @return Integer with hashed value / key for hash table.
+#' @export
 get_hash <- function(x, offset = 0, max = 256, mult = 17) {
   ((utf8ToInt(x) + offset) * mult) %% max
 }
 
+#' Get mapping for string, see
+#' [day 15 - 2023](https://adventofcode.com/2023/day/15)
+#'
+#' @param x String to be hashed.
+#' @param offset Integer with hashing offset.
+#' @param max Maximum number of elements in hashing table.
+#' @param mult Integer with scaling factor.
+#'
+#' @return Integer with mapped value.
+#' @export
 get_mapping <- function(x, offset = 0, max = 256, mult = 17) {
   for (i in seq_along(x)) {
     offset <- get_hash(x[i], offset, max, mult)
@@ -161,6 +182,13 @@ f15b <- function(x) {
   sum(boxes_power$power, na.rm = TRUE)
 }
 
+#' Map sequence of boxes , see
+#' [day 15 - 2023](https://adventofcode.com/2023/day/15)
+#'
+#' @param x List with parsed sequence.
+#'
+#' @return Hash table with mapped boxes.
+#' @export
 map_boxes <- function(x) {
   hsh_tb <- hashtab(type = c("identical", "address"), 256)
   for (i in seq_along(x)) {
@@ -175,18 +203,9 @@ map_boxes <- function(x) {
       } else { # box has contents
         # check if the current label is already in the box
         if (find_label_lens(contents, label)) {
-          sethash(hsh_tb,
-                  key,
-                  replace_label_lens(contents, label, lens)
-                  )
+          sethash(hsh_tb, key, replace_label_lens(contents, label, lens))
         } else { # not in the box
-          sethash(hsh_tb,
-                  key,
-                  paste0(contents,
-                         " ",
-                         new_box(label, lens)
-                         )
-                  )
+          sethash(hsh_tb, key, paste0(contents, " ", new_box(label, lens)))
         }
       }
     } else { # remove (if exists) and shift (remaining) lenses
@@ -195,54 +214,79 @@ map_boxes <- function(x) {
       key <- get_mapping(label)
       contents <- gethash(hsh_tb, key, nomatch = NULL)
       if (!is.null(contents)) { # box has contents
-        sethash(hsh_tb,
-                key,
-                remove_lense(contents, label)
-        )
+        sethash(hsh_tb, key, remove_label_lens(contents, label))
       }
     }
   }
   return(hsh_tb)
 }
 
+#' Create new box, see
+#' [day 15 - 2023](https://adventofcode.com/2023/day/15)
+#'
+#' @param label String with box label.
+#' @param lens String with box lens.
+#'
+#' @return String with new box.
+#' @export
 new_box <- function(label, lens) {
   sprintf("[%s %s]", paste0(label, collapse = ""), lens)
 }
 
+#' Find label-lens in box, see
+#' [day 15 - 2023](https://adventofcode.com/2023/day/15)
+#'
+#' @param contents String with contents of the box.
+#' @param label String with box label.
+#'
+#' @return Boolean value to indicate if the label-lens were found.
+#' @export
 find_label_lens <- function(contents, label) {
   grepl(sprintf("\\[%s", paste0(label, collapse = "")), contents)
 }
 
-find_lens <- function(contents, lens) {
-  grepl(sprintf("%s\\]", lens), contents)
-}
-
-remove_lense <- function(contents, label, lens) {
+#' Remove label-lens from box, see
+#' [day 15 - 2023](https://adventofcode.com/2023/day/15)
+#'
+#' @param contents String with contents of the box.
+#' @param label String with box label.
+#'
+#' @return String with new contents of the box.
+#' @export
+remove_label_lens <- function(contents, label) {
   gsub(sprintf("\\[%s\\s[0-9]{1,1}\\]", paste0(label, collapse = "")),
        "",
        contents)
 }
 
+#' Replace label-lens from box, see
+#' [day 15 - 2023](https://adventofcode.com/2023/day/15)
+#'
+#' @param contents String with contents of the box.
+#' @param label String with box label.
+#' @param lens String with box lens.
+#'
+#' @return String with new contents of the box.
+#' @export
 replace_label_lens <- function(contents, label, lens) {
   gsub(sprintf("\\[%s\\s[0-9]{1,1}\\]", paste0(label, collapse = "")),
        new_box(label, lens),
        contents)
 }
 
-replace_lens <- function(contents, label, lens) {
-  gsub(sprintf("\\[[a-z]+\\s%s\\]", lens),
-       new_box(label, lens),
-       contents)
-}
 
+#' Focus lens power, see
+#' [day 15 - 2023](https://adventofcode.com/2023/day/15)
+#'
+#' @param x Hash table with mapped boxes.
+#'
+#' @return Data frame with labels for boxes and power value.
+#' @export
 focus_power <- function(x) {
   keys <- sort(hashkeys(x))
   # get contents of hash table
-  contents <- list()
-  for (i in seq_along(keys)) {
-    contents <- c(contents,
-                  gethash(x, keys[i], list()))
-  }
+  contents <- lapply(keys, \(k) gethash(x, k, list()))
+
   # parse contents
   ## create new hashmap
   contents_hm <- hashtab()
@@ -252,8 +296,8 @@ focus_power <- function(x) {
     box_id <- as.numeric(keys[i])
     aux <- strsplit(gsub("^\\[|\\]$", "", trimws(ht)), "\\] \\[")[[1]]
     sapply(seq_along(aux), function(j) {
-      value <- gethash(contents_hm, aux[j], 0) + ((box_id + 1) * j *
-        as.numeric(gsub("\\D", "", aux[j])))
+      value <- gethash(contents_hm, aux[j], 0) +
+        ((box_id + 1) * j * as.numeric(gsub("\\D", "", aux[j])))
       sethash(contents_hm, aux[j], value)
     })
   })
