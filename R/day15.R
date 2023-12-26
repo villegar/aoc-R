@@ -154,7 +154,113 @@ get_mapping <- function(x, offset = 0, max = 256, mult = 17) {
 #' @rdname day15
 #' @export
 f15b <- function(x) {
+  parsed_sequence <- sapply(strsplit(x, ",")[[1]],
+                            \(x) strsplit(x, "")[[1]])
+  mapped_boxes <- map_boxes(parsed_sequence)
+  boxes_power <- focus_power(mapped_boxes)
+  sum(boxes_power$power, na.rm = TRUE)
+}
 
+map_boxes <- function(x) {
+  hsh_tb <- hashtab(type = c("identical", "address"), 256)
+  for (i in seq_along(x)) {
+    if (any(x[i][[1]] == "=")) { # add/replace [label lens]
+      label <- x[i][[1]][1:2]
+      lens <- x[i][[1]][4]
+      key <- get_mapping(label)
+      contents <- gethash(hsh_tb, key, nomatch = NULL)
+      if (is.null(contents)) { # empty box
+        sethash(hsh_tb, key, new_box(label, lens))
+      } else { # box has contents
+        # check if the current label is already in the box
+        if (find_label_lens(contents, label)) {
+          sethash(hsh_tb,
+                  key,
+                  replace_label_lens(contents, label, lens)
+                  )
+        } else { # not in the box
+          sethash(hsh_tb,
+                  key,
+                  paste0(contents,
+                         " ",
+                         new_box(label, lens)
+                         )
+                  )
+        }
+      }
+    } else { # remove (if exists) and shift (remaining) lenses
+      label <- x[i][[1]][1:2]
+      key <- get_mapping(label)
+      contents <- gethash(hsh_tb, key, nomatch = NULL)
+      if (!is.null(contents)) { # box has contents
+        sethash(hsh_tb,
+                key,
+                remove_lense(contents, label)
+        )
+      }
+    }
+  }
+  return(hsh_tb)
+}
+
+new_box <- function(label, lens) {
+  sprintf("[%s %s]", paste0(label, collapse = ""), lens)
+}
+
+find_label_lens <- function(contents, label) {
+  grepl(sprintf("\\[%s", paste0(label, collapse = "")), contents)
+}
+
+find_lens <- function(contents, lens) {
+  grepl(sprintf("%s\\]", lens), contents)
+}
+
+remove_lense <- function(contents, label, lens) {
+  gsub(sprintf("\\[%s\\s[0-9]{1,1}\\]", paste0(label, collapse = "")),
+       "",
+       contents)
+}
+
+replace_label_lens <- function(contents, label, lens) {
+  gsub(sprintf("\\[%s\\s[0-9]{1,1}\\]", paste0(label, collapse = "")),
+       new_box(label, lens),
+       contents)
+}
+
+replace_lens <- function(contents, label, lens) {
+  gsub(sprintf("\\[[a-z]{2,2}\\s%s\\]", lens),
+       new_box(label, lens),
+       contents)
+}
+
+focus_power <- function(x) {
+  keys <- sort(hashkeys(x))
+  # get contents of hash table
+  contents <- list()
+  for (i in seq_along(keys)) {
+    contents <- c(contents,
+                  gethash(x, keys[i], list()))
+  }
+  # parse contents
+  ## create new hashmap
+  contents_hm <- hashtab()
+  lapply(seq_along(contents), function(i) {
+    ht <- contents[i][[1]]
+    box_id <- as.numeric(keys[i])
+    aux <- strsplit(gsub("^\\[|\\]$", "",trimws(ht)),
+                    "\\] \\[")[[1]]
+    sapply(seq_along(aux), function(j) {
+      value <- gethash(contents_hm, aux[j], 0) + ((box_id + 1) * j *
+        as.numeric(gsub("\\D", "", aux[j])))
+      sethash(contents_hm, aux[j], value)
+    })
+  })
+
+  new_keys <- sort(hashkeys(contents_hm))
+  data.frame(
+    keys = new_keys,
+    power = sapply(new_keys, \(x) gethash(contents_hm, x, 0))
+  )
 }
 
 #' @param example Which example data to use (by position or name). Defaults to
