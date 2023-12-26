@@ -133,7 +133,7 @@
 #' @export
 #' @examples
 #' f15a(example_data_15())
-#' f15b()
+#' f15b(example_data_15())
 f15a <- function(x) {
   parsed_sequence <- sapply(strsplit(x, ",")[[1]],
                             \(x) strsplit(x, "")[[1]])
@@ -165,8 +165,9 @@ map_boxes <- function(x) {
   hsh_tb <- hashtab(type = c("identical", "address"), 256)
   for (i in seq_along(x)) {
     if (any(x[i][[1]] == "=")) { # add/replace [label lens]
-      label <- x[i][[1]][1:2]
-      lens <- x[i][[1]][4]
+      idx_op <- which(x[i][[1]] == "=")
+      label <- x[i][[1]][seq_len(idx_op - 1)]
+      lens <- x[i][[1]][idx_op + 1]
       key <- get_mapping(label)
       contents <- gethash(hsh_tb, key, nomatch = NULL)
       if (is.null(contents)) { # empty box
@@ -189,7 +190,8 @@ map_boxes <- function(x) {
         }
       }
     } else { # remove (if exists) and shift (remaining) lenses
-      label <- x[i][[1]][1:2]
+      idx_op <- which(x[i][[1]] == "-")
+      label <- x[i][[1]][seq_len(idx_op - 1)]
       key <- get_mapping(label)
       contents <- gethash(hsh_tb, key, nomatch = NULL)
       if (!is.null(contents)) { # box has contents
@@ -228,7 +230,7 @@ replace_label_lens <- function(contents, label, lens) {
 }
 
 replace_lens <- function(contents, label, lens) {
-  gsub(sprintf("\\[[a-z]{2,2}\\s%s\\]", lens),
+  gsub(sprintf("\\[[a-z]+\\s%s\\]", lens),
        new_box(label, lens),
        contents)
 }
@@ -245,10 +247,10 @@ focus_power <- function(x) {
   ## create new hashmap
   contents_hm <- hashtab()
   lapply(seq_along(contents), function(i) {
-    ht <- contents[i][[1]]
+    # extract contents and remove sequences of blank spaces
+    ht <- gsub("\\s+", " ", contents[i][[1]])
     box_id <- as.numeric(keys[i])
-    aux <- strsplit(gsub("^\\[|\\]$", "",trimws(ht)),
-                    "\\] \\[")[[1]]
+    aux <- strsplit(gsub("^\\[|\\]$", "", trimws(ht)), "\\] \\[")[[1]]
     sapply(seq_along(aux), function(j) {
       value <- gethash(contents_hm, aux[j], 0) + ((box_id + 1) * j *
         as.numeric(gsub("\\D", "", aux[j])))
