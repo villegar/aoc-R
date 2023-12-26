@@ -67,10 +67,16 @@
     <loc>https://aocR.robertovillegas-diaz.com/reference/day14.html</loc>
   </url>
   <url>
+    <loc>https://aocR.robertovillegas-diaz.com/reference/day15.html</loc>
+  </url>
+  <url>
     <loc>https://aocR.robertovillegas-diaz.com/reference/extrapolate_values.html</loc>
   </url>
   <url>
     <loc>https://aocR.robertovillegas-diaz.com/reference/f01_helper.html</loc>
+  </url>
+  <url>
+    <loc>https://aocR.robertovillegas-diaz.com/reference/find_label_lens.html</loc>
   </url>
   <url>
     <loc>https://aocR.robertovillegas-diaz.com/reference/find_mid_point_reflection.html</loc>
@@ -85,16 +91,25 @@
     <loc>https://aocR.robertovillegas-diaz.com/reference/first_true_element.html</loc>
   </url>
   <url>
+    <loc>https://aocR.robertovillegas-diaz.com/reference/focus_power.html</loc>
+  </url>
+  <url>
     <loc>https://aocR.robertovillegas-diaz.com/reference/get_adjacent_elements.html</loc>
   </url>
   <url>
     <loc>https://aocR.robertovillegas-diaz.com/reference/get_adjacent_elements_row.html</loc>
   </url>
   <url>
+    <loc>https://aocR.robertovillegas-diaz.com/reference/get_hash.html</loc>
+  </url>
+  <url>
     <loc>https://aocR.robertovillegas-diaz.com/reference/get_indices.html</loc>
   </url>
   <url>
     <loc>https://aocR.robertovillegas-diaz.com/reference/get_key.html</loc>
+  </url>
+  <url>
+    <loc>https://aocR.robertovillegas-diaz.com/reference/get_mapping.html</loc>
   </url>
   <url>
     <loc>https://aocR.robertovillegas-diaz.com/reference/get_next_tiles.html</loc>
@@ -104,6 +119,9 @@
   </url>
   <url>
     <loc>https://aocR.robertovillegas-diaz.com/reference/hand_strength.html</loc>
+  </url>
+  <url>
+    <loc>https://aocR.robertovillegas-diaz.com/reference/hashkeys.html</loc>
   </url>
   <url>
     <loc>https://aocR.robertovillegas-diaz.com/reference/ind2sub.html</loc>
@@ -124,6 +142,9 @@
     <loc>https://aocR.robertovillegas-diaz.com/reference/lookup_digit.html</loc>
   </url>
   <url>
+    <loc>https://aocR.robertovillegas-diaz.com/reference/map_boxes.html</loc>
+  </url>
+  <url>
     <loc>https://aocR.robertovillegas-diaz.com/reference/map_schematic.html</loc>
   </url>
   <url>
@@ -131,6 +152,9 @@
   </url>
   <url>
     <loc>https://aocR.robertovillegas-diaz.com/reference/navigate_pipe.html</loc>
+  </url>
+  <url>
+    <loc>https://aocR.robertovillegas-diaz.com/reference/new_box.html</loc>
   </url>
   <url>
     <loc>https://aocR.robertovillegas-diaz.com/reference/parse_cubes.html</loc>
@@ -160,7 +184,13 @@
     <loc>https://aocR.robertovillegas-diaz.com/reference/parse_seeds.html</loc>
   </url>
   <url>
+    <loc>https://aocR.robertovillegas-diaz.com/reference/remove_label_lens.html</loc>
+  </url>
+  <url>
     <loc>https://aocR.robertovillegas-diaz.com/reference/replace_chrs.html</loc>
+  </url>
+  <url>
+    <loc>https://aocR.robertovillegas-diaz.com/reference/replace_label_lens.html</loc>
   </url>
   <url>
     <loc>https://aocR.robertovillegas-diaz.com/reference/rev_str.html</loc>
